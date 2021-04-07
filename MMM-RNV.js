@@ -105,38 +105,38 @@ Module.register("MMM-RNV",{
         table.appendChild(tableHead);
 
         // Iterating over data
-        for (var i = 0; i < this.fetchedData.data.station.journeys.elements.length; i++) {
-            var currentDeparture  = this.fetchedData.data.station.journeys.elements[i];
-            var line = currentDeparture.line.id.split("-")[0];
+        for (let i = 0; i < this.fetchedData.data.station.journeys.elements.length; i++) {
+            const currentDeparture  = this.fetchedData.data.station.journeys.elements[i];
+            const line = currentDeparture.line.id.split("-")[0];
             // console.log(line);
             
             const type = currentDeparture.type;
             
-            var destination = currentDeparture.stops[0].destinationLabel;
+            const destination = currentDeparture.stops[0].destinationLabel;
             // console.log(destination);
-            var platform = currentDeparture.stops[0].pole.platform.label;
+            const platform = currentDeparture.stops[0].pole.platform.label;
             //console.log(platform);
 
-            var departureTimes = currentDeparture.stops[0];
+            const departureTimes = currentDeparture.stops[0];
 
-            var plannedDepartureIsoString = departureTimes.plannedDeparture.isoString;
-            var plannedDepartureDate = new Date(plannedDepartureIsoString);
-            var plannedDeparture = plannedDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
+            const plannedDepartureIsoString = departureTimes.plannedDeparture.isoString;
+            const plannedDepartureDate = new Date(plannedDepartureIsoString);
+            const plannedDeparture = plannedDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(plannedDeparture);
 
-            var realtimeDepartureIsoString = departureTimes.realtimeDeparture.isoString;
-            var realtimeDepartureDate = new Date(realtimeDepartureIsoString);
-            var realtimeDeparture = realtimeDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
+            const realtimeDepartureIsoString = departureTimes.realtimeDeparture.isoString;
+            const realtimeDepartureDate = new Date(realtimeDepartureIsoString);
+            // const realtimeDeparture = realtimeDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(realtimeDeparture);
 
-            var plannedArrivalIsoString = departureTimes.plannedArrival.isoString;
-            var plannedArrivalDate = new Date(plannedArrivalIsoString);
-            var plannedArrival = plannedArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
+            // const plannedArrivalIsoString = departureTimes.plannedArrival.isoString;
+            // const plannedArrivalDate = new Date(plannedArrivalIsoString);
+            // const plannedArrival = plannedArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(plannedArrival);
             
-            var realtimeArrivalIsoString = departureTimes.realtimeArrival.isoString;
-            var realtimeArrivalDate = new Date(realtimeArrivalIsoString);
-            var realtimeArrival = realtimeArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
+            // const realtimeArrivalIsoString = departureTimes.realtimeArrival.isoString;
+            // const realtimeArrivalDate = new Date(realtimeArrivalIsoString);
+            // const realtimeArrival = realtimeArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(realtimeArrival);
 
             const delayMilliseconds = Date(plannedDepartureDate) - Date(realtimeDepartureDate);
@@ -146,10 +146,10 @@ Module.register("MMM-RNV",{
 
             //console.log(delay);
 
-            var dataCellTime = document.createElement("td");
+            const dataCellTime = document.createElement("td");
             dataCellTime.innerHTML = plannedDeparture;
 
-            var dataCellTimeDelayed = document.createElement("span");
+            const dataCellTimeDelayed = document.createElement("span");
             dataCellTimeDelayed.className = "small";
 
             if (delay > 0) {
@@ -164,22 +164,22 @@ Module.register("MMM-RNV",{
             
             dataCellTime.appendChild(dataCellTimeDelayed);
             
-            var dataCellLineSymbol = document.createElement("td");
-            var dataCellLineSymbolSpan = document.createElement("span");
+            const dataCellLineSymbol = document.createElement("td");
+            const dataCellLineSymbolSpan = document.createElement("span");
             dataCellLineSymbolSpan.className = "fa fa-bus";
             dataCellLineSymbol.appendChild(dataCellLineSymbolSpan);
 
-            var dataCellLine = document.createElement("td");           
+            const dataCellLine = document.createElement("td");           
             dataCellLine.innerHTML = line;
             dataCellLine.className = "line";
             
-            var dataCellDirection = document.createElement("td");
+            const dataCellDirection = document.createElement("td");
             dataCellDirection.innerHTML = destination;
 
-            var dataCellPlatform = document.createElement("td");
+            const dataCellPlatform = document.createElement("td");
             dataCellPlatform.innerHTML = platform;
             
-            var dataRow = document.createElement("tr");
+            const dataRow = document.createElement("tr");
             dataRow.appendChild(dataCellTime);
             dataRow.appendChild(dataCellLineSymbol);
             dataRow.appendChild(dataCellLine);
