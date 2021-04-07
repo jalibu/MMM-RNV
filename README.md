@@ -27,7 +27,6 @@ The table below lists all possible costimizations like the position and header.
             position: 'top_right',
             config: {
                 apiKey: 'ENTER YOUR APIKEY HERE',
-                stationID: 'ENTER YOUR STATION HERE',
             }
         }
     ]
@@ -45,12 +44,12 @@ The following properties can be set:
 | or |
 | `clientID`| String | "" | Your personal client ID
 | `clientSecret` | String | "" | Your personal client secret
-| `resourceID`| String | "" | 
+| `resourceID`| String | "" | |
 
 
 ### Module
 
 | Option | Type | Default | Description |
 | ---- | ---- | ---- | ---- |
-| `stationID` | Int | 2417 | ID for Mannheim HBF |
-| `numJourneys` | Int | 10 | Number of shown departures. |
+| `stationID` | String | 2417 | ID for Mannheim HBF |
+| `numJourneys` | String | 10 | Number of shown departures. |
