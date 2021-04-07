@@ -1,5 +1,9 @@
 # MMM-RNV
 
+<p style="text-align: center">
+    <a href="https://david-dm.org/jupadin/MMM-RNV"><img src="https://david-dm.org/jupadin/MMM-RNV.svg" alt ="Dependency Status"></a>
+</p>
+
 This module is an extention for the [MagicMirror](https://github.com/MichMich/MagicMirror).
 
 The module is based on the work of [yawnsde](https://github.com/yawnsde/MMM-RNV) but uses the new Data Hub API.
