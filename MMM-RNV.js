@@ -11,7 +11,7 @@ Module.register("MMM-RNV",{
         header: "RNV Abfahrtsmonitor",
         animationSpeed: 2 * 1000, // 2 seconds
         stationID: "2417",
-        numJourneys: "5",
+        numJourneys: "10",
         apiKey: "",
         clientID: "",
         resourceID: "",
