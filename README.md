@@ -11,7 +11,9 @@ Either a valid API key or credentials are required, which can be requested here 
 
 Open a terminal session, navigate to your MagicMirror's `modules` folder and execute `git clone https://github/jupadin/MMM-RNV.git`, such that a new folder called MMM-RNV will be created.
 
-Activate the module by adding it to the `config.js`file as of the MagicMirror as shown below.
+Navigate inside the folder and execute `npm install` to install all dependencies.
+
+Activate the module by adding it to the `config.js` file of the MagicMirror as shown below.
 
 The ID of your specific station can be found here: https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen_mit_haltestellenreferenz.json
 
