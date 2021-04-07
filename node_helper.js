@@ -1,3 +1,10 @@
+/* Magic Mirror
+ * Module: MMM-RNV
+ *
+ * By Julian Dinter
+ * MIT Licensed.
+ */
+
 const NodeHelper = require('node_helper');
 
 const { ApolloClient } = require('apollo-client');
