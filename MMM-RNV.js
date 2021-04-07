@@ -50,7 +50,7 @@ Module.register("MMM-RNV",{
     
     // Override dom generator.
     getDom: function() {
-        var wrapper = document.createElement("div");
+        const wrapper = document.createElement("div");
         
         if (!this.credentials) {
             wrapper.innerHTML = "There are no <i>RNV Credentials</i> in config file set.";
@@ -74,26 +74,26 @@ Module.register("MMM-RNV",{
             return wrapper;
         }
 
-        var table = document.createElement("table");
+        const table = document.createElement("table");
         table.id = "RNVTable";
         table.className = "light small";
 
-        var tableHead = document.createElement("tr");
+        const tableHead = document.createElement("tr");
 
-        var tableHeadTime = document.createElement("th");
+        const tableHeadTime = document.createElement("th");
         tableHeadTime.innerHTML = "Abfahrt";
         tableHeadTime.className = "RNVTableHeader Departure";
 
-        var tableHeadLine = document.createElement("th");
+        const tableHeadLine = document.createElement("th");
         tableHeadLine.innerHTML = "Linie";
         tableHeadLine.className = "RNVTableHeader Line";
         tableHeadLine.colSpan = 2;
 
-        var tableHeadDestination = document.createElement("th");
+        const tableHeadDestination = document.createElement("th");
         tableHeadDestination.innerHTML = "Richtung";
         tableHeadDestination.className = "RNVTableHeader Destination";
 
-        var tableHeadPlatform = document.createElement("th");
+        const tableHeadPlatform = document.createElement("th");
         tableHeadPlatform.innerHTML = "Gleis";
         tableHeadPlatform.className = "RNVTableHeader Platform";
 
