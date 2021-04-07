@@ -62,6 +62,7 @@ module.exports = NodeHelper.create({
                             line {
                                 id
                             }
+                            type
                             stops(onlyHafasID: "${stationID}") {
                                 id
                                 pole {

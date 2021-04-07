@@ -109,6 +109,9 @@ Module.register("MMM-RNV",{
             var currentDeparture  = this.fetchedData.data.station.journeys.elements[i];
             var line = currentDeparture.line.id.split("-")[0];
             // console.log(line);
+            
+            const type = currentDeparture.type;
+            
             var destination = currentDeparture.stops[0].destinationLabel;
             // console.log(destination);
             var platform = currentDeparture.stops[0].pole.platform.label;
