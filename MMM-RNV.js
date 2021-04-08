@@ -104,6 +104,8 @@ Module.register("MMM-RNV",{
 
         table.appendChild(tableHead);
 
+        const factor = 60 * 1000;
+        let delay = 0;
         // Iterating over data
         for (let i = 0; i < this.fetchedData.data.station.journeys.elements.length; i++) {
             const currentDeparture  = this.fetchedData.data.station.journeys.elements[i];
@@ -139,12 +141,12 @@ Module.register("MMM-RNV",{
             // const realtimeArrival = realtimeArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(realtimeArrival);
 
-            const delayMilliseconds = Date(plannedDepartureDate) - Date(realtimeDepartureDate);
-            console.log(delayMilliseconds);
-            const factor = 60 * 1000;
-            const delay = Math.floor(delayMilliseconds / factor);
-
-            //console.log(delay);
+            if (realtimeDepartureIsoString != null) {
+                const delayMilliseconds = Math.abs(plannedDepartureDate - realtimeDepartureDate);
+                // console.log(delayMilliseconds);
+                delay = Math.floor(delayMilliseconds / factor);
+                //console.log(delay);
+            }
 
             const dataCellTime = document.createElement("td");
             dataCellTime.innerHTML = plannedDeparture;
