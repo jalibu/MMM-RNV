@@ -2,7 +2,7 @@
 
 <p style="text-align: center">
     <a href="https://david-dm.org/jupadin/MMM-RNV"><img src="https://david-dm.org/jupadin/MMM-RNV.svg" alt ="Dependency Status"></a>
-    <a href="https://choosealicense.com/licenses/mit"><img scr="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+    <a href="https://choosealicense.com/licenses/mit"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
 </p>
 
 This module is an extention for the [MagicMirror](https://github.com/MichMich/MagicMirror).
