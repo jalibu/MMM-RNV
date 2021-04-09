@@ -106,52 +106,61 @@ Module.register("MMM-RNV",{
 
         const factor = 60 * 1000;
         let delay = 0;
+
+        let departures = this.fetchedData.data.station.journeys.elements;
+
+        departures.sort(function(a, b) {
+            let depA = a.stops[0].plannedDepartureIsoString;
+            let depB = b.stops[0].plannedDepartureIsoString;
+            return (depA < depB) ? -1 : (depA > depB) ? 1 : 0;
+        });
+
         // Iterating over data
-        for (let i = 0; i < this.fetchedData.data.station.journeys.elements.length; i++) {
-            const currentDeparture  = this.fetchedData.data.station.journeys.elements[i];
-            const line = currentDeparture.line.id.split("-")[0];
+        for (let i = 0; i < departures.length; i++) {
+            let currentDeparture  = departures.elements[i];
+            let line = currentDeparture.line.id.split("-")[0];
             // console.log(line);
             
-            const type = currentDeparture.type;
+            let type = currentDeparture.type;
             
-            const destination = currentDeparture.stops[0].destinationLabel;
+            let destination = currentDeparture.stops[0].destinationLabel;
             // console.log(destination);
-            const platform = currentDeparture.stops[0].pole.platform.label;
+            let platform = currentDeparture.stops[0].pole.platform.label;
             //console.log(platform);
 
-            const departureTimes = currentDeparture.stops[0];
+            let departureTimes = currentDeparture.stops[0];
 
-            const plannedDepartureIsoString = departureTimes.plannedDeparture.isoString;
-            const plannedDepartureDate = new Date(plannedDepartureIsoString);
-            const plannedDeparture = plannedDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
+            let plannedDepartureIsoString = departureTimes.plannedDeparture.isoString;
+            let plannedDepartureDate = new Date(plannedDepartureIsoString);
+            let plannedDeparture = plannedDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(plannedDeparture);
 
-            const realtimeDepartureIsoString = departureTimes.realtimeDeparture.isoString;
-            const realtimeDepartureDate = new Date(realtimeDepartureIsoString);
-            // const realtimeDeparture = realtimeDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
+            let realtimeDepartureIsoString = departureTimes.realtimeDeparture.isoString;
+            let realtimeDepartureDate = new Date(realtimeDepartureIsoString);
+            // let realtimeDeparture = realtimeDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(realtimeDeparture);
 
-            // const plannedArrivalIsoString = departureTimes.plannedArrival.isoString;
-            // const plannedArrivalDate = new Date(plannedArrivalIsoString);
-            // const plannedArrival = plannedArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
+            // let plannedArrivalIsoString = departureTimes.plannedArrival.isoString;
+            // let plannedArrivalDate = new Date(plannedArrivalIsoString);
+            // let plannedArrival = plannedArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(plannedArrival);
             
-            // const realtimeArrivalIsoString = departureTimes.realtimeArrival.isoString;
-            // const realtimeArrivalDate = new Date(realtimeArrivalIsoString);
-            // const realtimeArrival = realtimeArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
+            // let realtimeArrivalIsoString = departureTimes.realtimeArrival.isoString;
+            // let realtimeArrivalDate = new Date(realtimeArrivalIsoString);
+            // let realtimeArrival = realtimeArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(realtimeArrival);
 
             if (realtimeDepartureIsoString != null) {
-                const delayMilliseconds = Math.abs(plannedDepartureDate - realtimeDepartureDate);
+                let delayMilliseconds = Math.abs(plannedDepartureDate - realtimeDepartureDate);
                 // console.log(delayMilliseconds);
                 delay = Math.floor(delayMilliseconds / factor);
                 //console.log(delay);
             }
 
-            const dataCellTime = document.createElement("td");
+            let dataCellTime = document.createElement("td");
             dataCellTime.innerHTML = plannedDeparture;
 
-            const dataCellTimeDelayed = document.createElement("span");
+            let dataCellTimeDelayed = document.createElement("span");
             dataCellTimeDelayed.className = "small";
 
             if (delay > 0) {
@@ -166,22 +175,22 @@ Module.register("MMM-RNV",{
             
             dataCellTime.appendChild(dataCellTimeDelayed);
             
-            const dataCellLineSymbol = document.createElement("td");
-            const dataCellLineSymbolSpan = document.createElement("span");
+            let dataCellLineSymbol = document.createElement("td");
+            let dataCellLineSymbolSpan = document.createElement("span");
             dataCellLineSymbolSpan.className = "fa fa-bus";
             dataCellLineSymbol.appendChild(dataCellLineSymbolSpan);
 
-            const dataCellLine = document.createElement("td");           
+            let dataCellLine = document.createElement("td");           
             dataCellLine.innerHTML = line;
             dataCellLine.className = "line";
             
-            const dataCellDirection = document.createElement("td");
+            let dataCellDirection = document.createElement("td");
             dataCellDirection.innerHTML = destination;
 
-            const dataCellPlatform = document.createElement("td");
+            let dataCellPlatform = document.createElement("td");
             dataCellPlatform.innerHTML = platform;
             
-            const dataRow = document.createElement("tr");
+            let dataRow = document.createElement("tr");
             dataRow.appendChild(dataCellTime);
             dataRow.appendChild(dataCellLineSymbol);
             dataRow.appendChild(dataCellLine);
