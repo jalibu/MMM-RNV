@@ -19,6 +19,10 @@ Module.register("MMM-RNV",{
         oAuthURL: "",
         clientAPIURL: "https://graphql-sandbox-dds.rnv-online.de",
         refreshInterval: 1 * 60 * 1000, // every 1 minute
+        icon: {
+            "STRASSENBAHN" : "fas fa-train",
+            "STADTBUS" : "fas fa-bus"
+        },
     },
     
     // Define start sequence.
@@ -162,7 +166,6 @@ Module.register("MMM-RNV",{
 
             let dataCellTimeDelayed = document.createElement("span");
             dataCellTimeDelayed.className = "small";
-
             if (delay > 0) {
                 dataCellTimeDelayed.innerHTML = ' +' + delay;
                 dataCellTimeDelayed.classList.add("late");
@@ -170,14 +173,18 @@ Module.register("MMM-RNV",{
                 dataCellTimeDelayed.innerHTML = ' -' + delay;
                 dataCellTimeDelayed.classList.add("early");
             } else {
-                dataCellTimeDelayed.style.visibility = 'hidden';
+                dataCellTimeDelayed.innerHTML = ' +' + delay;
+                dataCellTimeDelayed.style.visibility = "hidden";
             }
             
             dataCellTime.appendChild(dataCellTimeDelayed);
             
             let dataCellLineSymbol = document.createElement("td");
             let dataCellLineSymbolSpan = document.createElement("span");
-            dataCellLineSymbolSpan.className = "fa fa-bus";
+            
+            dataCellLineSymbolSpan.className = this.config.icon[type];
+            // dataCellLineSymbolSpan.className = "fa fa-bus";
+
             dataCellLineSymbol.appendChild(dataCellLineSymbolSpan);
 
             let dataCellLine = document.createElement("td");           
