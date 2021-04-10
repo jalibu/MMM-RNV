@@ -4,6 +4,23 @@
  * By Julian Dinter
  * MIT Licensed.
  */
+
+ #RNVTable {
+     width: 100%;
+ }
+
+.RNVTableHeader {
+    text-align: left;
+    padding: 0px;
+}
+
+.Direction {
+    width: 50%;
+}
+
+.delay {
+    padding-left: 10px;
+}
  
 .late {
     color: #FF0000;
@@ -13,26 +30,10 @@
     color: #00FF00;
 }
 
-.RNVTableHeader {
-    text-align: left;
+.icon {
+    padding-right: 10px;
 }
 
-.Departure {
-    padding: 0px 5px 0px 5px;
-    text-align: left;
-}
-
-.Line {
-    padding: 0px 5px 0px 5px;
-    text-align: right;
-}
-
-.Destination {
-    padding: 0px 5px 0px 5px;
-    text-align: left;
-}
-
-.Platform {
-    padding: 0px 5px 0px 5px;
-    text-align: left;
+.data {
+    padding-left: 5px;
 }

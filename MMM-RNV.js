@@ -48,6 +48,7 @@ Module.register("MMM-RNV",{
         return [];
     },
     
+    // Define header.
     getHeader: function() {
         return this.config.header;
     },
@@ -72,12 +73,13 @@ Module.register("MMM-RNV",{
             return wrapper;
         }
 
-        if (this.loaded && !this.fetchedData.data.station.journeys.elements.length) {
+        if (this.loaded && this.fetchedData.data.station.journeys.elements.length == 0) {
             wrapper.innerHTML = "No data available";
             wrapper.className = "light small dimmed";
             return wrapper;
         }
 
+        // Create dom table
         const table = document.createElement("table");
         table.id = "RNVTable";
         table.className = "light small";
@@ -91,11 +93,10 @@ Module.register("MMM-RNV",{
         const tableHeadLine = document.createElement("th");
         tableHeadLine.innerHTML = "Linie";
         tableHeadLine.className = "RNVTableHeader Line";
-        tableHeadLine.colSpan = 2;
 
         const tableHeadDestination = document.createElement("th");
         tableHeadDestination.innerHTML = "Richtung";
-        tableHeadDestination.className = "RNVTableHeader Destination";
+        tableHeadDestination.className = "RNVTableHeader Direction";
 
         const tableHeadPlatform = document.createElement("th");
         tableHeadPlatform.innerHTML = "Gleis";
@@ -108,11 +109,22 @@ Module.register("MMM-RNV",{
 
         table.appendChild(tableHead);
 
+        // Horizontal rule after table header
+        const hruleRow = document.createElement("tr");
+        const hruleData = document.createElement("td");
+        hruleData.colSpan = 4;
+        hruleData.innerHTML = "<hr>";
+
+        hruleRow.appendChild(hruleData);
+        table.appendChild(hruleRow);
+
+        // Variable declaration for table data
         const factor = 60 * 1000;
         let delay = 0;
-
+        let delayMilliseconds = 0;
         let departures = this.fetchedData.data.station.journeys.elements;
 
+        // Sort departures based on their planned departure
         departures.sort(function(a, b) {
             let depA = a.stops[0].plannedDepartureIsoString;
             let depB = b.stops[0].plannedDepartureIsoString;
@@ -155,51 +167,56 @@ Module.register("MMM-RNV",{
             //console.log(realtimeArrival);
 
             if (realtimeDepartureIsoString != null) {
-                let delayMilliseconds = Math.abs(plannedDepartureDate - realtimeDepartureDate);
-                // console.log(delayMilliseconds);
+                delayMilliseconds = Math.abs(plannedDepartureDate - realtimeDepartureDate);
                 delay = Math.floor(delayMilliseconds / factor);
-                //console.log(delay);
             }
 
+            // Time
             let dataCellTime = document.createElement("td");
+            dataCellTime.className = "data";
             dataCellTime.innerHTML = plannedDeparture;
 
-            let dataCellTimeDelayed = document.createElement("span");
-            dataCellTimeDelayed.className = "small";
+            // -- Delay
+            let dataCellTimeDelay = document.createElement("span");
+            dataCellTimeDelay.className = "small delay";
             if (delay > 0) {
-                dataCellTimeDelayed.innerHTML = ' +' + delay;
-                dataCellTimeDelayed.classList.add("late");
+                dataCellTimeDelay.innerHTML = "+ " + delay;
+                dataCellTimeDelay.classList.add("late");
             } else if (delay < 0) {
-                dataCellTimeDelayed.innerHTML = ' -' + delay;
-                dataCellTimeDelayed.classList.add("early");
+                dataCellTimeDelay.innerHTML = "- " + delay;
+                dataCellTimeDelay.classList.add("early");
             } else {
-                dataCellTimeDelayed.innerHTML = ' +' + delay;
-                dataCellTimeDelayed.style.visibility = "hidden";
+                dataCellTimeDelay.innerHTML = "+ " + delay;
+                dataCellTimeDelay.style.visibility = "hidden";
             }
             
-            dataCellTime.appendChild(dataCellTimeDelayed);
+            dataCellTime.appendChild(dataCellTimeDelay);
             
-            let dataCellLineSymbol = document.createElement("td");
-            let dataCellLineSymbolSpan = document.createElement("span");
-            
-            dataCellLineSymbolSpan.className = this.config.icon[type];
-            // dataCellLineSymbolSpan.className = "fa fa-bus";
+            // Line
+            let dataCellLine = document.createElement("td");
+            dataCellLine.className = "data";
+            // -- Span
+            let dataCellLineSpan = document.createElement("span");
+            dataCellLineSpan.className = "icon";
+            // ---- Icon
+            let dataCellLineIcon = document.createElement("i");
+            dataCellLineIcon.className = this.config.icon[type];
 
-            dataCellLineSymbol.appendChild(dataCellLineSymbolSpan);
-
-            let dataCellLine = document.createElement("td");           
+            dataCellLineSpan.appendChild(dataCellLineIcon);    
             dataCellLine.innerHTML = line;
-            dataCellLine.className = "line";
             
+            // Direction
             let dataCellDirection = document.createElement("td");
+            dataCellDirection.className = "data";
             dataCellDirection.innerHTML = destination;
 
+            // Platform
             let dataCellPlatform = document.createElement("td");
+            dataCellPlatform.className = "data";
             dataCellPlatform.innerHTML = platform;
             
             let dataRow = document.createElement("tr");
             dataRow.appendChild(dataCellTime);
-            dataRow.appendChild(dataCellLineSymbol);
             dataRow.appendChild(dataCellLine);
             dataRow.appendChild(dataCellDirection);
             dataRow.appendChild(dataCellPlatform);
@@ -207,6 +224,7 @@ Module.register("MMM-RNV",{
             table.appendChild(dataRow);
         }
         wrapper.appendChild(table);
+
         // Return the wrapper to the dom.
         return wrapper;
     },
