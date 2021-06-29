@@ -30,10 +30,16 @@ The table below lists all possible costimizations like the position and header.
     modules: [
         {
             module: 'MMM-RNV',
-            header: 'RNV Abfahrsmonitor',
+            header: 'RNV Abfahrstmonitor',
             position: 'top_right',
             config: {
-                apiKey: 'ENTER YOUR APIKEY HERE',
+                apiKey: 'Enter your apiKey here',
+                or
+                clientID: 'Enter your @clientID here',
+                clientSecret: 'Enter your @clientSecret here',
+                resourceID: 'Enter your @resource here',
+                oAuthURL: 'Enter your @scope URL here'
+
             }
         }
     ]
@@ -60,6 +66,7 @@ The remaining data and credentials, provided by the RNV, is not needed.
 
 | Option | Type | Default | Description |
 | ---- | ---- | ---- | ---- |
-| `stationID` | String | 2417 | ID for Mannheim HBF |
-| `numJourneys` | String | 10 | Number of shown departures. |
-| `updateInterval` | String | 1 | How often the table shall be updated [minutes] |
+| `header` | String | "" | Header which will be displayed |
+| `stationID` | String | "2417" | ID for Mannheim HBF |
+| `numJourneys` | String | "10" | Number of shown departures. |
+| `updateInterval` | String | "1" | How often the table shall be updated [minutes] |
