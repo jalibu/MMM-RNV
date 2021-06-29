@@ -23,7 +23,7 @@ Activate the module by adding it to the `config.js` file of the MagicMirror as s
 The ID of your specific station can be found here: https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen_mit_haltestellenreferenz.json
 
 
-The table below lists all possible costimizations like the position and header.
+The table below lists all possible configuration options.
 
 ## Using the module
 ````javascript
@@ -47,7 +47,7 @@ The table below lists all possible costimizations like the position and header.
 
 ## Configuration options
 
-The following properties can be set:
+The following configuration options can be set and/or changed:
 
 ### Authentication
 
@@ -66,7 +66,8 @@ The remaining data and credentials, provided by the RNV, is not needed.
 
 | Option | Type | Default | Description |
 | ---- | ---- | ---- | ---- |
-| `header` | String | "" | Header which will be displayed |
+| `header` | String | "RNV Abfahrtsmonitor" | Header which will be displayed |
 | `stationID` | String | "2417" | ID for Mannheim HBF |
 | `numJourneys` | String | "10" | Number of shown departures. |
 | `updateInterval` | String | "1" | How often the table shall be updated [minutes] |
+| `animationSpeed` | String | "2" | Animation speed to show up the table [seconds] |
