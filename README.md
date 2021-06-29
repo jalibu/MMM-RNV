@@ -45,15 +45,16 @@ The following properties can be set:
 
 ### Authentication
 
-| Option | Type | Default | Description |
+| Option | Type | Default | Description | Given names from RNV |
 | ---- | ---- | ---- | ---- |
 | `apiKey` | String | "" | Your personal API Key |
 | or |
-| `clientID`| String | "" | Your client ID |
-| `clientSecret` | String | "" | Your client secret |
-| `resourceID`| String | "" | Your resourceID |
-| `oAuthURL` | String | "" | URL to authentication site to generate the access token |
+| `clientID`| String | "" | Your client ID | @clientID |
+| `clientSecret` | String | "" | Your client secret | @clientSecret |
+| `resourceID`| String | "" | Your resourceID | @resource |
+| `oAuthURL` | String | "" | URL to authentication site to generate the access token | @scope |
 
+The remaining data and credentials, provided by the RNV, is not needed.
 
 ### Module
 
