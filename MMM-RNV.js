@@ -18,7 +18,7 @@ Module.register("MMM-RNV",{
         clientSecret: "",
         oAuthURL: "",
         clientAPIURL: "https://graphql-sandbox-dds.rnv-online.de",
-        refreshInterval: 1 * 60 * 1000, // every 1 minute
+        refreshInterval: 5 * 1000,//1 * 60 * 1000, // every 1 minute
         icon: {
             "STRASSENBAHN" : "fas fa-train",
             "STADTBUS" : "fas fa-bus"
