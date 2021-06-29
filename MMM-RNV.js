@@ -32,7 +32,7 @@ Module.register("MMM-RNV",{
         this.credentials = false;
         this.fetchedData = null;
 
-        if ( (this.config.apiKey) || (this.config.cliendID && this.config.clientSecret && this.config.oAuthURL && this.config.resourceID) ) {
+        if ( (this.config.apiKey) || (this.config.clientID && this.config.clientSecret && this.config.oAuthURL && this.config.resourceID) ) {
             this.credentials = true;
             this.sendSocketNotification("SET_CONFIG", this.config);
         }
