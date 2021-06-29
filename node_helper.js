@@ -36,7 +36,7 @@ module.exports = NodeHelper.create({
                 const clientSecret = this.config.clientSecret;
                 const resourceID = this.config.resourceID;
                 // Asynchronously create apiKey from given credentials
-                this.config.apiKey = this.createToken(oAuthURL, clientID, clientSecret, resourceID);
+                this.config.apiKey = await this.createToken(oAuthURL, clientID, clientSecret, resourceID);
             }
             // Authenticate by OAuth
             this.client = this.authenticate(this.config.apiKey);
