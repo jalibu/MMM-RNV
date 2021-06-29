@@ -46,8 +46,8 @@ The following properties can be set:
 ### Authentication
 
 | Option | Type | Default | Description | Given names from RNV |
-| ---- | ---- | ---- | ---- |
-| `apiKey` | String | "" | Your personal API Key |
+| ---- | ---- | ---- | ---- | ---- |
+| `apiKey` | String | "" | Your personal API Key | - |
 | or |
 | `clientID`| String | "" | Your client ID | @clientID |
 | `clientSecret` | String | "" | Your client secret | @clientSecret |
