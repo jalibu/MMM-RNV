@@ -133,7 +133,7 @@ Module.register("MMM-RNV",{
 
         // Iterating over data
         for (let i = 0; i < departures.length; i++) {
-            let currentDeparture  = departures.elements[i];
+            let currentDeparture  = departures[i];
             let line = currentDeparture.line.id.split("-")[0];
             // console.log(line);
             
