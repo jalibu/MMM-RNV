@@ -49,9 +49,10 @@ The following properties can be set:
 | ---- | ---- | ---- | ---- |
 | `apiKey` | String | "" | Your personal API Key |
 | or |
-| `clientID`| String | "" | Your personal client ID
-| `clientSecret` | String | "" | Your personal client secret
-| `resourceID`| String | "" | |
+| `clientID`| String | "" | Your client ID |
+| `clientSecret` | String | "" | Your client secret |
+| `resourceID`| String | "" | Your resourceID |
+| `oAuthURL` | String | "" | URL to authentication site to generate the access token |
 
 
 ### Module
@@ -60,3 +61,4 @@ The following properties can be set:
 | ---- | ---- | ---- | ---- |
 | `stationID` | String | 2417 | ID for Mannheim HBF |
 | `numJourneys` | String | 10 | Number of shown departures. |
+| `updateInterval` | String | 1 | How often the table shall be updated [minutes] |
