@@ -25,18 +25,18 @@ module.exports = NodeHelper.create({
         console.log("Ending: " + this.name);
     },
 
-    socketNotificationReceived: function(notification, payload) {
+    socketNotificationReceived: async function(notification, payload) {
         if (notification == "SET_CONFIG") {
             this.config = payload;
 
-            if (!this.config.apiKey) {
+            if (this.config.apiKey == '' || !this.config.apiKey) {
                 console.log(this.name + ": Creating APIKey...");
-                const oauthURL = this.config.oauthURL;
+                const oAuthURL = this.config.oAuthURL;
                 const clientID = this.config.clientID;
                 const clientSecret = this.config.clientSecret;
                 const resourceID = this.config.resourceID;
-                // Set apiKey to config object
-                this.config.apiKey = this.createToken(oauthURL, clientID, clientSecret, resourceID);
+                // Asynchronously create apiKey from given credentials
+                this.config.apiKey = await this.createToken(oAuthURL, clientID, clientSecret, resourceID);
             }
             // Authenticate by OAuth
             this.client = this.authenticate(this.config.apiKey);
@@ -93,37 +93,29 @@ module.exports = NodeHelper.create({
             }
         }`;
         this.client.query({ query: gql(query) }).then(fetchedData => {
-            // console.log(JSON.stringify(fetchedData, null, "  "));
             this.sendSocketNotification("DATA", fetchedData);
-        }).catch((error) => console.log("Error:\n", error));
+        }).catch((error) => console.log("Error while querying data from server:\n", error));
         
-        // setTimeout(this.getData(), (this.config.refreshInterval));
+        setTimeout(this.getData.bind(this), (this.config.refreshInterval));
     },
 
-    // Create access token if there is non given
-    createToken: function(OAUTH_URL, CLIENT_ID, CLIENT_SECRET, RESOURCE_ID) {
-        const accessToken = async () => {
-            const promise = new Promise(async (resolve, reject) => {
-                const response = await fetch(OAUTH_URL, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: 'grant_type=client_credentials&client_id=' + CLIENT_ID + '&client_secret=' + CLIENT_SECRET + '&resource=' + RESOURCE_ID 
-                });
+    // Create access token if there is none given in the configuration file
+    createToken: async function(OAUTH_URL, CLIENT_ID, CLIENT_SECRET, RESOURCE_ID) {
+        const response = await fetch(OAUTH_URL, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'grant_type=client_credentials&client_id=' + CLIENT_ID + '&client_secret=' + CLIENT_SECRET + '&resource=' + RESOURCE_ID 
+        });
         
-                if (response.status != 200 || !response.ok) {
-                    reject("Error: Fetch code is != 200");
-                }
-
-                resolve(response.json());
-            }).catch((error) => console.log("Error: ", error))
-
-            const json = await promise;
-            return json["access_token"];
+        if (!response.ok) {
+            console.error("Error while creating access token.", response.error);
+            return null;
         }
-        return accessToken;
+        const json = await response.json();
+        return json["access_token"];
     },
     
-    // Authenticate if token is given
+    // Authenticate with given token
     authenticate: function(token) {        
         var httpLink = new HttpLink({uri: this.config.clientAPIURL, credentials: 'same-origin', fetch: fetch});
         

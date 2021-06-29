@@ -18,7 +18,7 @@ Module.register("MMM-RNV",{
         clientSecret: "",
         oAuthURL: "",
         clientAPIURL: "https://graphql-sandbox-dds.rnv-online.de",
-        refreshInterval: 1 * 60 * 1000, // every 1 minute
+        refreshInterval: 5 * 1000,//1 * 60 * 1000, // every 1 minute
         icon: {
             "STRASSENBAHN" : "fas fa-train",
             "STADTBUS" : "fas fa-bus"
@@ -133,7 +133,7 @@ Module.register("MMM-RNV",{
 
         // Iterating over data
         for (let i = 0; i < departures.length; i++) {
-            let currentDeparture  = departures.elements[i];
+            let currentDeparture  = departures[i];
             let line = currentDeparture.line.id.split("-")[0];
             // console.log(line);
             
