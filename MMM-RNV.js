@@ -118,7 +118,7 @@ Module.register("MMM-RNV",{
         hruleRow.appendChild(hruleData);
         table.appendChild(hruleRow);
 
-        // Variable declaration for table data
+        // Variable declaration to calculate delay of each departure
         const factor = 60 * 1000;
         let delay = 0;
         let delayMilliseconds = 0;
@@ -131,40 +131,23 @@ Module.register("MMM-RNV",{
             return (depA < depB) ? -1 : (depA > depB) ? 1 : 0;
         });
 
-        // Iterating over data
+        // Iterating over received data
         for (let i = 0; i < departures.length; i++) {
             let currentDeparture  = departures[i];
+
             let line = currentDeparture.line.id.split("-")[0];
-            // console.log(line);
-            
             let type = currentDeparture.type;
-            
             let destination = currentDeparture.stops[0].destinationLabel;
-            // console.log(destination);
             let platform = currentDeparture.stops[0].pole.platform.label;
-            //console.log(platform);
 
             let departureTimes = currentDeparture.stops[0];
 
             let plannedDepartureIsoString = departureTimes.plannedDeparture.isoString;
             let plannedDepartureDate = new Date(plannedDepartureIsoString);
             let plannedDeparture = plannedDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
-            //console.log(plannedDeparture);
 
             let realtimeDepartureIsoString = departureTimes.realtimeDeparture.isoString;
             let realtimeDepartureDate = new Date(realtimeDepartureIsoString);
-            // let realtimeDeparture = realtimeDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
-            //console.log(realtimeDeparture);
-
-            // let plannedArrivalIsoString = departureTimes.plannedArrival.isoString;
-            // let plannedArrivalDate = new Date(plannedArrivalIsoString);
-            // let plannedArrival = plannedArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
-            //console.log(plannedArrival);
-            
-            // let realtimeArrivalIsoString = departureTimes.realtimeArrival.isoString;
-            // let realtimeArrivalDate = new Date(realtimeArrivalIsoString);
-            // let realtimeArrival = realtimeArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
-            //console.log(realtimeArrival);
 
             if (realtimeDepartureIsoString != null) {
                 delayMilliseconds = Math.abs(plannedDepartureDate - realtimeDepartureDate);
@@ -231,7 +214,6 @@ Module.register("MMM-RNV",{
     
     // Override socket notification handler.
     socketNotificationReceived: function(notification, payload) {
-        // console.log(this.name + " received a socket notification: " + notification + " - Payload: " + payload);
         this.fetchedData = payload;
         this.loaded = true;
         this.updateDom(this.config.animationSpeed);
