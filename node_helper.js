@@ -134,15 +134,15 @@ module.exports = NodeHelper.create({
             }
 
             // Log fetched data
-            for (let i = 0; i < numDepartures; i++) {
-                let c = fetchedData.data.station.journeys.elements[i];
-                let t = c.stops[0].plannedDeparture.isoString;
-                let d = c.stops[0].destinationLabel;
-                let l = c.line.id.split("-")[1];
-                let p = c.stops[0].pole.platform.label;
-                let delay = c.stops[0].delay;
-                console.log(t, "\t", l, "\t", p, "\t", delay, "\t", d);
-            }
+            // for (let i = 0; i < numDepartures; i++) {
+            //     let c = fetchedData.data.station.journeys.elements[i];
+            //     let t = c.stops[0].plannedDeparture.isoString;
+            //     let d = c.stops[0].destinationLabel;
+            //     let l = c.line.id.split("-")[1];
+            //     let p = c.stops[0].pole.platform.label;
+            //     let delay = c.stops[0].delay;
+            //     console.log(t, "\t", l, "\t", p, "\t", delay, "\t", d);
+            // }
 
             // Send data to front-end
             this.sendSocketNotification("DATA", fetchedData);
