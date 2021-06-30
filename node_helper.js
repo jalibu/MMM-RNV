@@ -93,12 +93,23 @@ module.exports = NodeHelper.create({
             }
         }`;
         this.client.query({ query: gql(query) }).then(fetchedData => {
-            this.sendSocketNotification("DATA", fetchedData);
+            // Sorting fetched data based on the departure times
+            fetchedData.data.station.journeys.elements.sort((a, b) => {
+                let depA = a.stops[0].plannedDeparture.isoString;
+                let depB = b.stops[0].plannedDeparture.isoString;
+                return (depA < depB) ? -1 : ((depA > depB) ? 1 : 0);
+            });
+
+            // Log how many depatures were fetched
             const numOfDepartures = fetchedData.data.station.journeys.elements.length
-            console.log(this.name + ": Fetched ", numOfDepartures, " departures.");
+            console.log(this.name + ": Fetched", numOfDepartures, "departures.");
+
+            // Send data to front-end
+            this.sendSocketNotification("DATA", fetchedData);
+
         }).catch((error) => console.log("Error while querying data from server:\n", error));
         
-        // Set timeout to continuously receive new data
+        // Set timeout to continuously fetch new data from RNV-Server
         setTimeout(this.getData.bind(this), (this.config.updateInterval));
     },
 

@@ -124,13 +124,6 @@ Module.register("MMM-RNV",{
         let delayMilliseconds = 0;
         let departures = this.fetchedData.data.station.journeys.elements;
 
-        // Sort departures based on their planned departure
-        departures.sort(function(a, b) {
-            let depA = a.stops[0].plannedDepartureIsoString;
-            let depB = b.stops[0].plannedDepartureIsoString;
-            return (depA < depB) ? -1 : (depA > depB) ? 1 : 0;
-        });
-
         // Iterating over data
         for (let i = 0; i < departures.length; i++) {
             let currentDeparture  = departures[i];
