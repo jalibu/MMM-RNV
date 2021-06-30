@@ -174,6 +174,7 @@ Module.register("MMM-RNV",{
             // Time
             let dataCellTime = document.createElement("td");
             dataCellTime.className = "data";
+            dataCellTime.classList.add("time");
             dataCellTime.innerHTML = plannedDeparture;
 
             // -- Delay

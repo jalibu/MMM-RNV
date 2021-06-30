@@ -14,12 +14,18 @@
     padding: 0px;
 }
 
+.time {
+    text-align: left;
+}
+
 .Direction {
     width: 50%;
+    text-align: left;
 }
 
 .delay {
     padding-left: 10px;
+    text-align: left;
 }
  
 .late {

@@ -35,7 +35,7 @@ module.exports = NodeHelper.create({
                 const clientID = this.config.clientID;
                 const clientSecret = this.config.clientSecret;
                 const resourceID = this.config.resourceID;
-                // Asynchronously create apiKey from given credentials
+                // Create apiKey from given credentials
                 this.config.apiKey = await this.createToken(oAuthURL, clientID, clientSecret, resourceID);
             }
             // Authenticate by OAuth
@@ -94,8 +94,11 @@ module.exports = NodeHelper.create({
         }`;
         this.client.query({ query: gql(query) }).then(fetchedData => {
             this.sendSocketNotification("DATA", fetchedData);
+            const numOfDepartures = fetchedData.data.station.journeys.elements.length
+            console.log(this.name + ": Fetched ", numOfDepartures, " departures.");
         }).catch((error) => console.log("Error while querying data from server:\n", error));
         
+        // Set timeout to continuously receive new data
         setTimeout(this.getData.bind(this), (this.config.updateInterval));
     },
 
