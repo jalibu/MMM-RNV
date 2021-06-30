@@ -122,41 +122,30 @@ Module.register("MMM-RNV",{
         const factor = 60 * 1000;
         let delay = 0;
         let delayMilliseconds = 0;
-        let departures = this.fetchedData.data.station.journeys.elements;
+        const numDepartures = this.fetchedData.data.station.journeys.elements.length;
 
-        // Sort departures based on their planned departure
-        departures.sort(function(a, b) {
-            let depA = a.stops[0].plannedDepartureIsoString;
-            let depB = b.stops[0].plannedDepartureIsoString;
-            return (depA < depB) ? -1 : (depA > depB) ? 1 : 0;
-        });
-
-        // Iterating over received data
-        for (let i = 0; i < departures.length; i++) {
-            let currentDeparture  = departures[i];
-
-            let line = currentDeparture.line.id.split("-")[0];
+        // Iterating over data
+        for (let i = 0; i < numDepartures; i++) {
+            let currentDeparture  = this.fetchedData.data.station.journeys.elements[i];
+            let line = currentDeparture.line.id.split("-")[1];
             let type = currentDeparture.type;
+
             let destination = currentDeparture.stops[0].destinationLabel;
             let platform = currentDeparture.stops[0].pole.platform.label;
+            let delay = currentDeparture.stops[0].delay;
 
             let departureTimes = currentDeparture.stops[0];
-
             let plannedDepartureIsoString = departureTimes.plannedDeparture.isoString;
             let plannedDepartureDate = new Date(plannedDepartureIsoString);
             let plannedDeparture = plannedDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
 
-            let realtimeDepartureIsoString = departureTimes.realtimeDeparture.isoString;
-            let realtimeDepartureDate = new Date(realtimeDepartureIsoString);
-
-            if (realtimeDepartureIsoString != null) {
-                delayMilliseconds = Math.abs(plannedDepartureDate - realtimeDepartureDate);
-                delay = Math.floor(delayMilliseconds / factor);
-            }
+            // Log
+            console.log(plannedDepartureIsoString, line, platform, delay, destination);
 
             // Time
             let dataCellTime = document.createElement("td");
             dataCellTime.className = "data";
+            dataCellTime.classList.add("time");
             dataCellTime.innerHTML = plannedDeparture;
 
             // -- Delay

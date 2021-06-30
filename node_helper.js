@@ -64,9 +64,7 @@ module.exports = NodeHelper.create({
                             }
                             type
                             stops(onlyHafasID: "${stationID}") {
-                                id
                                 pole {
-                                    id
                                     platform {
                                         type
                                         label
@@ -74,16 +72,16 @@ module.exports = NodeHelper.create({
                                     }
                                 }
                                 destinationLabel
-                                plannedDeparture {
-                                    isoString
-                                }
-                                realtimeDeparture {
-                                    isoString
-                                }
                                 plannedArrival {
                                     isoString
                                 }
                                 realtimeArrival {
+                                    isoString
+                                }
+                                plannedDeparture {
+                                    isoString
+                                }
+                                realtimeDeparture {
                                     isoString
                                 }
                             }
@@ -93,11 +91,65 @@ module.exports = NodeHelper.create({
             }
         }`;
         this.client.query({ query: gql(query) }).then(fetchedData => {
-            // Send fetched data to front-end
+            // Remove elements where its depature time is equal to null
+            // Iteration from end of array since the command *splice* might reduce its size.
+            for (let i = fetchedData.data.station.journeys.elements.length - 1; i >= 0; i--) {
+                if (fetchedData.data.station.journeys.elements[i].stops[0].plannedDeparture.isoString == null) {
+                    fetchedData.data.station.journeys.elements.splice(i, 1);
+                }
+            }
+
+            // Sorting fetched data based on the departure times
+            fetchedData.data.station.journeys.elements.sort((a, b) => {
+                let depA = a.stops[0].plannedDeparture.isoString;
+                let depB = b.stops[0].plannedDeparture.isoString;
+                return (depA < depB) ? -1 : ((depA > depB) ? 1 : 0);
+            });
+
+            
+            const numDepartures = fetchedData.data.station.journeys.elements.length;
+            const delayFactor = 60 * 1000;
+
+            for (let i = 0; i < numDepartures; i++) {
+                // Create new key-value pair, representing the current delay of the departure
+                fetchedData.data.station.journeys.elements[i].stops[0].delay = 0;
+                // If there is no realtime departure data avaialble, skip delay calculation and continue with next departure
+                if (fetchedData.data.station.journeys.elements[i].stops[0].realtimeDeparture.isoString == null) {
+                    continue;
+                }
+                
+                let currentDepartureTimes = fetchedData.data.station.journeys.elements[i].stops[0];
+                // Planned Departure
+                let plannedDepartureIsoString = currentDepartureTimes.plannedDeparture.isoString;
+                let plannedDepartureDate = new Date(plannedDepartureIsoString);
+                // Realtime Departure
+                let realtimeDepartureIsoString = currentDepartureTimes.realtimeDeparture.isoString;
+                let realtimeDepartureDate = new Date(realtimeDepartureIsoString);
+
+                let delayms = Math.abs(plannedDepartureDate - realtimeDepartureDate);
+                let delay = Math.floor(delayms / delayFactor);
+
+                // Assign calculated delay to new introduced key-value pair
+                fetchedData.data.station.journeys.elements[i].delay = delay;
+            }
+
+            // Log fetched data
+            for (let i = 0; i < numDepartures; i++) {
+                let c = fetchedData.data.station.journeys.elements[i];
+                let t = c.stops[0].plannedDeparture.isoString;
+                let d = c.stops[0].destinationLabel;
+                let l = c.line.id.split("-")[1];
+                let p = c.stops[0].pole.platform.label;
+                let delay = c.stops[0].delay;
+                console.log(t, "\t", l, "\t", p, "\t", delay, "\t", d);
+            }
+
+            // Send data to front-end
             this.sendSocketNotification("DATA", fetchedData);
+
         }).catch((error) => console.log("Error while querying data from server:\n", error));
         
-        // Set timeout to automatically fetch and update data
+        // Set timeout to continuously fetch new data from RNV-Server
         setTimeout(this.getData.bind(this), (this.config.updateInterval));
     },
 
