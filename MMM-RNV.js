@@ -166,7 +166,7 @@ Module.register("MMM-RNV",{
             // }
 
             // Log
-            console.log(plannedDepartureIsoString, "\t", line, "\t", p, "\t", delay, "\t", destination);
+            console.log(plannedDepartureIsoString, line, platform, delay, destination);
 
             // Time
             let dataCellTime = document.createElement("td");
