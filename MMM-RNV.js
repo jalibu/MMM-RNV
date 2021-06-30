@@ -127,7 +127,7 @@ Module.register("MMM-RNV",{
         // Iterating over data
         for (let i = 0; i < departures.length; i++) {
             let currentDeparture  = departures[i];
-            let line = currentDeparture.line.id.split("-")[0];
+            let line = currentDeparture.line.id.split("-")[1];
             // console.log(line);
             
             let type = currentDeparture.type;
@@ -136,16 +136,17 @@ Module.register("MMM-RNV",{
             // console.log(destination);
             let platform = currentDeparture.stops[0].pole.platform.label;
             //console.log(platform);
+            let delay = currentDeparture.stops[0].delay;
+            console.log(delay);
 
             let departureTimes = currentDeparture.stops[0];
-
             let plannedDepartureIsoString = departureTimes.plannedDeparture.isoString;
             let plannedDepartureDate = new Date(plannedDepartureIsoString);
             let plannedDeparture = plannedDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(plannedDeparture);
 
-            let realtimeDepartureIsoString = departureTimes.realtimeDeparture.isoString;
-            let realtimeDepartureDate = new Date(realtimeDepartureIsoString);
+            // let realtimeDepartureIsoString = departureTimes.realtimeDeparture.isoString;
+            // let realtimeDepartureDate = new Date(realtimeDepartureIsoString);
             // let realtimeDeparture = realtimeDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(realtimeDeparture);
 
@@ -159,10 +160,13 @@ Module.register("MMM-RNV",{
             // let realtimeArrival = realtimeArrivalDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
             //console.log(realtimeArrival);
 
-            if (realtimeDepartureIsoString != null) {
-                delayMilliseconds = Math.abs(plannedDepartureDate - realtimeDepartureDate);
-                delay = Math.floor(delayMilliseconds / factor);
-            }
+            // if (realtimeDepartureIsoString != null) {
+            //     delayMilliseconds = Math.abs(plannedDepartureDate - realtimeDepartureDate);
+            //     delay = Math.floor(delayMilliseconds / factor);
+            // }
+
+            // Log
+            console.log(plannedDepartureIsoString, "\t", line, "\t", p, "\t", delay, "\t", destination);
 
             // Time
             let dataCellTime = document.createElement("td");
