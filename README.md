@@ -69,5 +69,5 @@ The remaining data and credentials, provided by the RNV, is not needed.
 | `header` | String | "RNV Abfahrtsmonitor" | Header which will be displayed |
 | `stationID` | String | "2417" | ID for Mannheim HBF |
 | `numJourneys` | String | "10" | Number of shown departures. |
-| `updateInterval` | String | "1" | How often the table shall be updated [minutes] |
-| `animationSpeed` | String | "2" | Animation speed to show up the table [seconds] |
+| `updateInterval` | String | "60000" (1 minute) | How often the table shall be updated [milliseconds] |
+| `animationSpeed` | String | "2000" (2 seconds)| Animation speed to show up the table [milliseconds] |

@@ -96,7 +96,7 @@ module.exports = NodeHelper.create({
             this.sendSocketNotification("DATA", fetchedData);
         }).catch((error) => console.log("Error while querying data from server:\n", error));
         
-        setTimeout(this.getData.bind(this), (this.config.updateInterval * 60 * 1000));
+        setTimeout(this.getData.bind(this), (this.config.updateInterval));
     },
 
     // Create access token if there is none given in the configuration file
