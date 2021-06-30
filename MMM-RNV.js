@@ -118,13 +118,8 @@ Module.register("MMM-RNV",{
         hruleRow.appendChild(hruleData);
         table.appendChild(hruleRow);
 
-        // Variable declaration to calculate delay of each departure
-        const factor = 60 * 1000;
-        let delay = 0;
-        let delayMilliseconds = 0;
         const numDepartures = this.fetchedData.data.station.journeys.elements.length;
-
-        // Iterating over data
+        // Iterating over received data
         for (let i = 0; i < numDepartures; i++) {
             let currentDeparture  = this.fetchedData.data.station.journeys.elements[i];
             let line = currentDeparture.line.id.split("-")[1];
@@ -140,7 +135,7 @@ Module.register("MMM-RNV",{
             let plannedDeparture = plannedDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
 
             // Log
-            console.log(plannedDepartureIsoString, line, platform, delay, destination);
+            //console.log(plannedDepartureIsoString, line, platform, delay, destination);
 
             // Time
             let dataCellTime = document.createElement("td");
