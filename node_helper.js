@@ -64,9 +64,7 @@ module.exports = NodeHelper.create({
                             }
                             type
                             stops(onlyHafasID: "${stationID}") {
-                                id
                                 pole {
-                                    id
                                     platform {
                                         type
                                         label
@@ -74,16 +72,16 @@ module.exports = NodeHelper.create({
                                     }
                                 }
                                 destinationLabel
-                                plannedDeparture {
-                                    isoString
-                                }
-                                realtimeDeparture {
-                                    isoString
-                                }
                                 plannedArrival {
                                     isoString
                                 }
                                 realtimeArrival {
+                                    isoString
+                                }
+                                plannedDeparture {
+                                    isoString
+                                }
+                                realtimeDeparture {
                                     isoString
                                 }
                             }
@@ -93,6 +91,14 @@ module.exports = NodeHelper.create({
             }
         }`;
         this.client.query({ query: gql(query) }).then(fetchedData => {
+            const numDepatures = fetchedData.data.station.journeys.elements.length;
+            // Remove elements where its depature time is equal to null
+            for (let i = numDepatures - 1; i >= 0; i--) {
+                if (fetchedData.data.station.journeys.elements[i].stops[0].plannedDeparture.isoString == null) {
+                    fetchedData.data.station.journeys.elements.splice(i, 1);
+                }
+            }
+
             // Sorting fetched data based on the departure times
             fetchedData.data.station.journeys.elements.sort((a, b) => {
                 let depA = a.stops[0].plannedDeparture.isoString;
@@ -100,9 +106,19 @@ module.exports = NodeHelper.create({
                 return (depA < depB) ? -1 : ((depA > depB) ? 1 : 0);
             });
 
-            // Log how many depatures were fetched
-            const numOfDepartures = fetchedData.data.station.journeys.elements.length
-            console.log(this.name + ": Fetched", numOfDepartures, "departures.");
+            // Log how many depatures were "actually" fetched
+            //const numOfDepartures = fetchedData.data.station.journeys.elements.length
+            //console.log(this.name + ": Fetched", numOfDepartures, "departures.");
+
+            // Log fetched data
+            for (let i = numDepatures - 1; i >= 0; i--) {
+                let c = fetchedData.data.station.journeys.elements[i];
+                let t = c.stops[0].plannedDeparture.isoString;
+                let d = c.stops[0].destinationLabel;
+                let l = c.line.id.split("-")[1];
+                let p = c.stops[0].pole.platform.label;
+                console.log(t, "\t", l, "\t", d);
+            }
 
             // Send data to front-end
             this.sendSocketNotification("DATA", fetchedData);
