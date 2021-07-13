@@ -19,6 +19,7 @@ module.exports = NodeHelper.create({
     start: function() {
         this.config = null;
         this.client = null;
+        this.previousFetchOk = false;
     },
 
     end: function() {
@@ -35,6 +36,9 @@ module.exports = NodeHelper.create({
                 const clientID = this.config.clientID;
                 const clientSecret = this.config.clientSecret;
                 const resourceID = this.config.resourceID;
+                if (!clientID || !clientSecret || !oAuthURL || !resourceID) {
+                    // TODO: Error
+                }
                 // Create apiKey from given credentials
                 this.config.apiKey = await this.createToken(oAuthURL, clientID, clientSecret, resourceID);
             }
@@ -110,6 +114,7 @@ module.exports = NodeHelper.create({
             const numDepartures = fetchedData.data.station.journeys.elements.length;
             const delayFactor = 60 * 1000;
 
+            // Delay Calculation
             for (let i = 0; i < numDepartures; i++) {
                 // Create new key-value pair, representing the current delay of the departure
                 fetchedData.data.station.journeys.elements[i].stops[0].delay = 0;
@@ -128,6 +133,7 @@ module.exports = NodeHelper.create({
 
                 let delayms = Math.abs(plannedDepartureDate - realtimeDepartureDate);
                 let delay = Math.floor(delayms / delayFactor);
+                // TODO: Check delay values ?
 
                 // Assign calculated delay to new introduced key-value pair
                 fetchedData.data.station.journeys.elements[i].delay = delay;
@@ -144,13 +150,52 @@ module.exports = NodeHelper.create({
                 console.log(t, "\t", l, "\t", p, "\t", delay, "\t", d);
             }
 
+            this.previousFetchOk = true;
+
             // Send data to front-end
             this.sendSocketNotification("DATA", fetchedData);
 
-        }).catch((error) => console.log("Error while querying data from server:\n", error));
-        
-        // Set timeout to continuously fetch new data from RNV-Server
-        setTimeout(this.getData.bind(this), (this.config.updateInterval));
+            // Set timeout to continuously fetch new data from RNV-Server
+            setTimeout(this.getData.bind(this), (this.config.updateInterval));
+
+        }).catch((error) => {
+            // If there is "only" a apiKey given in the configuration,
+            // tell the user to update the key (since it is expired).
+            console.log("Your apiKey expired...\nTrying to generate a new one...\n", error);
+            const clientID = this.config.clientID;
+            const clientSecret = this.config.clientSecret;
+            const oAuthURL = this.config.oAuthURL;
+            const resourceID = this.config.resourceID;
+            const previousFetchOk = this.config.previousFetchOk;
+            if (clientID && clientSecret && oAuthURL && resourceID && previousFetchOk) {
+                // Reset previousFetchOk, since there was an error (key expired (?))
+                this.previousFetchOk = false;
+                console.log("Got credentials...\n");
+                // Update apiKey with given credentials
+                console.log("Create new apiKey...");
+                this.createToken(oAuthURL, clientID, clientSecret, resourceID).then(key => {
+                    // Renew apiKey
+                    console.log("Got new apiKey...");
+                    this.config.apiKey = key;
+
+                    // Renew client
+                    console.log("Renew client...");
+                    this.client = this.authenticate(this.config.apiKey);
+
+                    // Call function to retrieve new data from RNV-Server with new generated apiKey...
+                    //TODO: Not sure whether this leads to a memory leak...
+                    this.getData();
+                });
+            } else {
+                console.log("Error trying to generate a new apiKey.\nPlease manually update your apiKey.");
+                console.log("Error while querying data from server:\n", error);
+                // Create error return value
+                const errValue = 0;
+                // And send socket notification back to front-end to display the / an error...
+                this.sendSocketNotification("ERROR", errValue);
+                return null;
+            }
+        });
     },
 
     // Create access token if there is none given in the configuration file
