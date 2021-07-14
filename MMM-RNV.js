@@ -9,7 +9,7 @@ Module.register("MMM-RNV",{
    // Default module config.
    defaults: {
         header: "RNV Abfahrtsmonitor",
-        animationSpeed: 2 * 1000, // 2 seconds
+        animationSpeed: 0, // immediately
         stationID: "2417",
         numJourneys: "10",
         apiKey: "",
@@ -198,8 +198,12 @@ Module.register("MMM-RNV",{
     
     // Override socket notification handler.
     socketNotificationReceived: function(notification, payload) {
-        this.fetchedData = payload;
-        this.loaded = true;
-        this.updateDom(this.config.animationSpeed);
+        if (notification == "DATA") {
+            this.fetchedData = payload;
+            this.loaded = true;
+            this.updateDom(0);//this.config.animationSpeed);
+        } else if (notification == "ERROR") {
+            // TODO: Update front-end to display specific error.
+        }
     }
 });

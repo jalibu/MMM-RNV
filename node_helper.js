@@ -52,6 +52,7 @@ module.exports = NodeHelper.create({
     getData: function() {
         console.log(this.name + ": Fetching data from RNV-Server...");
         const now = new Date().toISOString();
+        console.log(now);
         const numJourneys = this.config.numJourneys;
         const stationID = this.config.stationID;
 
@@ -161,16 +162,17 @@ module.exports = NodeHelper.create({
         }).catch((error) => {
             // If there is "only" a apiKey given in the configuration,
             // tell the user to update the key (since it is expired).
-            console.log("Your apiKey expired...\nTrying to generate a new one...\n", error);
+            console.log("Your apiKey expired... Trying to generate a new one...\n", error);
             const clientID = this.config.clientID;
             const clientSecret = this.config.clientSecret;
             const oAuthURL = this.config.oAuthURL;
             const resourceID = this.config.resourceID;
-            const previousFetchOk = this.config.previousFetchOk;
+            const previousFetchOk = this.previousFetchOk;
+            console.log(previousFetchOk);
             if (clientID && clientSecret && oAuthURL && resourceID && previousFetchOk) {
                 // Reset previousFetchOk, since there was an error (key expired (?))
                 this.previousFetchOk = false;
-                console.log("Got credentials...\n");
+                console.log("Got credentials...");
                 // Update apiKey with given credentials
                 console.log("Create new apiKey...");
                 this.createToken(oAuthURL, clientID, clientSecret, resourceID).then(key => {
@@ -187,7 +189,7 @@ module.exports = NodeHelper.create({
                     this.getData();
                 });
             } else {
-                console.log("Error trying to generate a new apiKey.\nPlease manually update your apiKey.");
+                console.log("Error trying to generate a new apiKey. Please manually update your apiKey.");
                 console.log("Error while querying data from server:\n", error);
                 // Create error return value
                 const errValue = 0;
