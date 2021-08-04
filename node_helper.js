@@ -30,15 +30,12 @@ module.exports = NodeHelper.create({
         if (notification == "SET_CONFIG") {
             this.config = payload;
 
-            if (this.config.apiKey == '' || !this.config.apiKey) {
+            if (!this.config.apiKey) {
                 console.log(this.name + ": Creating APIKey...");
                 const oAuthURL = this.config.oAuthURL;
                 const clientID = this.config.clientID;
                 const clientSecret = this.config.clientSecret;
                 const resourceID = this.config.resourceID;
-                if (!clientID || !clientSecret || !oAuthURL || !resourceID) {
-                    // TODO: Error
-                }
                 // Create apiKey from given credentials
                 this.config.apiKey = await this.createToken(oAuthURL, clientID, clientSecret, resourceID);
             }
@@ -52,7 +49,7 @@ module.exports = NodeHelper.create({
     getData: function() {
         console.log(this.name + ": Fetching data from RNV-Server...");
         const now = new Date().toISOString();
-        console.log(now);
+        // console.log(now);
         const numJourneys = this.config.numJourneys;
         const stationID = this.config.stationID;
 
@@ -115,7 +112,7 @@ module.exports = NodeHelper.create({
             const numDepartures = fetchedData.data.station.journeys.elements.length;
             const delayFactor = 60 * 1000;
 
-            // Delay Calculation
+            // Delay
             for (let i = 0; i < numDepartures; i++) {
                 // Create new key-value pair, representing the current delay of the departure
                 fetchedData.data.station.journeys.elements[i].stops[0].delay = 0;
@@ -131,10 +128,11 @@ module.exports = NodeHelper.create({
                 // Realtime Departure
                 let realtimeDepartureIsoString = currentDepartureTimes.realtimeDeparture.isoString;
                 let realtimeDepartureDate = new Date(realtimeDepartureIsoString);
-
+                // Delay calculation
                 let delayms = Math.abs(plannedDepartureDate - realtimeDepartureDate);
                 let delay = Math.floor(delayms / delayFactor);
-                // TODO: Check delay values ?
+                
+                console.log(delayms);
 
                 // Assign calculated delay to new introduced key-value pair
                 fetchedData.data.station.journeys.elements[i].delay = delay;
@@ -150,7 +148,7 @@ module.exports = NodeHelper.create({
                 let delay = c.stops[0].delay;
                 console.log(t, "\t", l, "\t", p, "\t", delay, "\t", d);
             }
-
+            // Set flag to check whether a previous fetch was successful
             this.previousFetchOk = true;
 
             // Send data to front-end
@@ -168,7 +166,9 @@ module.exports = NodeHelper.create({
             const oAuthURL = this.config.oAuthURL;
             const resourceID = this.config.resourceID;
             const previousFetchOk = this.previousFetchOk;
+
             console.log(previousFetchOk);
+
             if (clientID && clientSecret && oAuthURL && resourceID && previousFetchOk) {
                 // Reset previousFetchOk, since there was an error (key expired (?))
                 this.previousFetchOk = false;
@@ -184,18 +184,16 @@ module.exports = NodeHelper.create({
                     console.log("Renew client...");
                     this.client = this.authenticate(this.config.apiKey);
 
-                    // Call function to retrieve new data from RNV-Server with new generated apiKey...
-                    //TODO: Not sure whether this leads to a memory leak...
-                    this.getData();
+                    // Fetch new data from RNV-Server
+                    this.getData.bind(this);
                 });
             } else {
                 console.log("Error trying to generate a new apiKey. Please manually update your apiKey.");
                 console.log("Error while querying data from server:\n", error);
                 // Create error return value
-                const errValue = 0;
+                const errValue = 1;
                 // And send socket notification back to front-end to display the / an error...
                 this.sendSocketNotification("ERROR", errValue);
-                return null;
             }
         });
     },

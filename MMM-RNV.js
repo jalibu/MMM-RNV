@@ -9,7 +9,7 @@ Module.register("MMM-RNV",{
    // Default module config.
    defaults: {
         header: "RNV Abfahrtsmonitor",
-        animationSpeed: 0, // immediately
+        animationSpeed: 2 * 1000, // 2 seconds
         stationID: "2417",
         numJourneys: "10",
         apiKey: "",
@@ -127,7 +127,7 @@ Module.register("MMM-RNV",{
 
             let destination = currentDeparture.stops[0].destinationLabel;
             let platform = currentDeparture.stops[0].pole.platform.label;
-            let delay = currentDeparture.stops[0].delay;
+            let delay = currentDeparture.delay;
 
             let departureTimes = currentDeparture.stops[0];
             let plannedDepartureIsoString = departureTimes.plannedDeparture.isoString;
@@ -199,9 +199,14 @@ Module.register("MMM-RNV",{
     // Override socket notification handler.
     socketNotificationReceived: function(notification, payload) {
         if (notification == "DATA") {
+            var animationSpeed = this.config.animationSpeed;
+            if (this.loaded) {
+                animationSpeed = 0;
+            }
             this.fetchedData = payload;
             this.loaded = true;
-            this.updateDom(0);//this.config.animationSpeed);
+            // Update dom with given animation speed
+            this.updateDom(animationSpeed);
         } else if (notification == "ERROR") {
             // TODO: Update front-end to display specific error.
         }
