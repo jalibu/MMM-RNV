@@ -14,7 +14,7 @@ Either a valid API key or credentials are required, which can be requested here 
 
 ## Installation
 
-Open a terminal session, navigate to your MagicMirror's `modules` folder and execute `git clone https://github/jupadin/MMM-RNV.git`, such that a new folder called MMM-RNV will be created.
+Open a terminal session, navigate to your MagicMirror's `modules` folder and execute `git clone https://github.com/jupadin/MMM-RNV.git`, such that a new folder called MMM-RNV will be created.
 
 Navigate inside the folder and execute `npm install` to install all dependencies.
 
