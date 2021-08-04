@@ -31,6 +31,7 @@ module.exports = NodeHelper.create({
             this.config = payload;
 
             if (!this.config.apiKey) {
+                console.log(this.name + ": Creating APIKey...");
                 const oAuthURL = this.config.oAuthURL;
                 const clientID = this.config.clientID;
                 const clientSecret = this.config.clientSecret;
@@ -143,26 +144,38 @@ module.exports = NodeHelper.create({
             setTimeout(this.getData.bind(this), (this.config.updateInterval));
 
         }).catch((error) => {
+            // If there is "only" a apiKey given in the configuration,
+            // tell the user to update the key (since it is expired).
+            console.log("Your apiKey expired... Trying to generate a new one...\n", error);
             const clientID = this.config.clientID;
             const clientSecret = this.config.clientSecret;
             const oAuthURL = this.config.oAuthURL;
             const resourceID = this.config.resourceID;
             const previousFetchOk = this.previousFetchOk;
 
+            console.log(previousFetchOk);
+
             if (clientID && clientSecret && oAuthURL && resourceID && previousFetchOk) {
                 // Reset previousFetchOk, since there was an error (key expired (?))
                 this.previousFetchOk = false;
+                console.log("Got credentials...");
+                // Update apiKey with given credentials
+                console.log("Create new apiKey...");
                 this.createToken(oAuthURL, clientID, clientSecret, resourceID).then(key => {
                     // Renew apiKey
+                    console.log("Got new apiKey...");
                     this.config.apiKey = key;
 
                     // Renew client
+                    console.log("Renew client...");
                     this.client = this.authenticate(this.config.apiKey);
 
                     // Fetch new data from RNV-Server
                     this.getData.bind(this);
                 });
             } else {
+                console.log("Error trying to generate a new apiKey. Please manually update your apiKey.");
+                console.log("Error while querying data from server:\n", error);
                 // Create error return value
                 const errValue = 1;
                 // And send socket notification back to front-end to display the / an error...
