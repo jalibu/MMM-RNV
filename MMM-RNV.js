@@ -127,7 +127,7 @@ Module.register("MMM-RNV",{
 
             let destination = currentDeparture.stops[0].destinationLabel;
             let platform = currentDeparture.stops[0].pole.platform.label;
-            let delay = currentDeparture.delay;
+            let delay = currentDeparture.stops[0].delay;
 
             let departureTimes = currentDeparture.stops[0];
             let plannedDepartureIsoString = departureTimes.plannedDeparture.isoString;
