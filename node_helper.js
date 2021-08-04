@@ -129,7 +129,7 @@ module.exports = NodeHelper.create({
                 let delay = Math.floor(delayms / delayFactor);
 
                 // Assign calculated delay to new introduced key-value pair
-                fetchedData.data.station.journeys.elements[i].delay = delay;
+                fetchedData.data.station.journeys.elements[i].stops[0].delay = delay;
             }
 
             // Set flag to check whether a previous fetch was successful
@@ -150,8 +150,6 @@ module.exports = NodeHelper.create({
             const resourceID = this.config.resourceID;
             const previousFetchOk = this.previousFetchOk;
 
-            console.log(previousFetchOk);
-
             if (clientID && clientSecret && oAuthURL && resourceID && previousFetchOk) {
                 // Reset previousFetchOk, since there was an error (key expired (?))
                 this.previousFetchOk = false;
@@ -164,7 +162,7 @@ module.exports = NodeHelper.create({
                     this.client = this.authenticate(this.config.apiKey);
 
                     // Fetch new data from RNV-Server
-                    this.getData.bind(this);
+                    this.getData();
                 });
             } else {
                 // Create error return value
