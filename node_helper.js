@@ -19,6 +19,7 @@ module.exports = NodeHelper.create({
     start: function() {
         this.config = null;
         this.client = null;
+        this.previousFetchOk = false;
     },
 
     end: function() {
@@ -29,8 +30,7 @@ module.exports = NodeHelper.create({
         if (notification == "SET_CONFIG") {
             this.config = payload;
 
-            if (this.config.apiKey == '' || !this.config.apiKey) {
-                console.log(this.name + ": Creating APIKey...");
+            if (!this.config.apiKey) {
                 const oAuthURL = this.config.oAuthURL;
                 const clientID = this.config.clientID;
                 const clientSecret = this.config.clientSecret;
@@ -106,10 +106,10 @@ module.exports = NodeHelper.create({
                 return (depA < depB) ? -1 : ((depA > depB) ? 1 : 0);
             });
 
-            
             const numDepartures = fetchedData.data.station.journeys.elements.length;
             const delayFactor = 60 * 1000;
 
+            // Delay
             for (let i = 0; i < numDepartures; i++) {
                 // Create new key-value pair, representing the current delay of the departure
                 fetchedData.data.station.journeys.elements[i].stops[0].delay = 0;
@@ -125,7 +125,7 @@ module.exports = NodeHelper.create({
                 // Realtime Departure
                 let realtimeDepartureIsoString = currentDepartureTimes.realtimeDeparture.isoString;
                 let realtimeDepartureDate = new Date(realtimeDepartureIsoString);
-
+                // Delay calculation
                 let delayms = Math.abs(plannedDepartureDate - realtimeDepartureDate);
                 let delay = Math.floor(delayms / delayFactor);
 
@@ -133,24 +133,42 @@ module.exports = NodeHelper.create({
                 fetchedData.data.station.journeys.elements[i].delay = delay;
             }
 
-            // Log fetched data
-            // for (let i = 0; i < numDepartures; i++) {
-            //     let c = fetchedData.data.station.journeys.elements[i];
-            //     let t = c.stops[0].plannedDeparture.isoString;
-            //     let d = c.stops[0].destinationLabel;
-            //     let l = c.line.id.split("-")[1];
-            //     let p = c.stops[0].pole.platform.label;
-            //     let delay = c.stops[0].delay;
-            //     console.log(t, "\t", l, "\t", p, "\t", delay, "\t", d);
-            // }
+            // Set flag to check whether a previous fetch was successful
+            this.previousFetchOk = true;
 
             // Send data to front-end
             this.sendSocketNotification("DATA", fetchedData);
 
-        }).catch((error) => console.log("Error while querying data from server:\n", error));
-        
-        // Set timeout to continuously fetch new data from RNV-Server
-        setTimeout(this.getData.bind(this), (this.config.updateInterval));
+            // Set timeout to continuously fetch new data from RNV-Server
+            setTimeout(this.getData.bind(this), (this.config.updateInterval));
+
+        }).catch((error) => {
+            const clientID = this.config.clientID;
+            const clientSecret = this.config.clientSecret;
+            const oAuthURL = this.config.oAuthURL;
+            const resourceID = this.config.resourceID;
+            const previousFetchOk = this.previousFetchOk;
+
+            if (clientID && clientSecret && oAuthURL && resourceID && previousFetchOk) {
+                // Reset previousFetchOk, since there was an error (key expired (?))
+                this.previousFetchOk = false;
+                this.createToken(oAuthURL, clientID, clientSecret, resourceID).then(key => {
+                    // Renew apiKey
+                    this.config.apiKey = key;
+
+                    // Renew client
+                    this.client = this.authenticate(this.config.apiKey);
+
+                    // Fetch new data from RNV-Server
+                    this.getData.bind(this);
+                });
+            } else {
+                // Create error return value
+                const errValue = 1;
+                // And send socket notification back to front-end to display the / an error...
+                this.sendSocketNotification("ERROR", errValue);
+            }
+        });
     },
 
     // Create access token if there is none given in the configuration file

@@ -127,15 +127,12 @@ Module.register("MMM-RNV",{
 
             let destination = currentDeparture.stops[0].destinationLabel;
             let platform = currentDeparture.stops[0].pole.platform.label;
-            let delay = currentDeparture.stops[0].delay;
+            let delay = currentDeparture.delay;
 
             let departureTimes = currentDeparture.stops[0];
             let plannedDepartureIsoString = departureTimes.plannedDeparture.isoString;
             let plannedDepartureDate = new Date(plannedDepartureIsoString);
             let plannedDeparture = plannedDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
-
-            // Log
-            //console.log(plannedDepartureIsoString, line, platform, delay, destination);
 
             // Time
             let dataCellTime = document.createElement("td");
@@ -198,8 +195,17 @@ Module.register("MMM-RNV",{
     
     // Override socket notification handler.
     socketNotificationReceived: function(notification, payload) {
-        this.fetchedData = payload;
-        this.loaded = true;
-        this.updateDom(this.config.animationSpeed);
+        if (notification == "DATA") {
+            var animationSpeed = this.config.animationSpeed;
+            if (this.loaded) {
+                animationSpeed = 0;
+            }
+            this.fetchedData = payload;
+            this.loaded = true;
+            // Update dom with given animation speed
+            this.updateDom(animationSpeed);
+        } else if (notification == "ERROR") {
+            // TODO: Update front-end to display specific error.
+        }
     }
 });

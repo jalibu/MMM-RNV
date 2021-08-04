@@ -34,7 +34,7 @@ The table below lists all possible configuration options.
             position: 'top_right',
             config: {
                 apiKey: 'Enter your apiKey here',
-                or
+                // or
                 clientID: 'Enter your @clientID here',
                 clientSecret: 'Enter your @clientSecret here',
                 resourceID: 'Enter your @resource here',
@@ -70,4 +70,4 @@ The remaining data and credentials, provided by the RNV, is not needed.
 | `stationID` | String | "2417" | ID for Mannheim HBF |
 | `numJourneys` | String | "10" | Number of shown departures. |
 | `updateInterval` | String | "60000" (1 minute) | How often the table shall be updated [milliseconds] |
-| `animationSpeed` | String | "2000" (2 seconds)| Animation speed to show up the table [milliseconds] |
+| `animationSpeed` | String | "2000" (2 seconds)| Animation speed to fade in the module on startup [milliseconds] |
