@@ -31,7 +31,6 @@ module.exports = NodeHelper.create({
             this.config = payload;
 
             if (!this.config.apiKey) {
-                console.log(this.name + ": Creating APIKey...");
                 const oAuthURL = this.config.oAuthURL;
                 const clientID = this.config.clientID;
                 const clientSecret = this.config.clientSecret;
@@ -49,7 +48,6 @@ module.exports = NodeHelper.create({
     getData: function() {
         console.log(this.name + ": Fetching data from RNV-Server...");
         const now = new Date().toISOString();
-        // console.log(now);
         const numJourneys = this.config.numJourneys;
         const stationID = this.config.stationID;
 
@@ -108,7 +106,6 @@ module.exports = NodeHelper.create({
                 return (depA < depB) ? -1 : ((depA > depB) ? 1 : 0);
             });
 
-            
             const numDepartures = fetchedData.data.station.journeys.elements.length;
             const delayFactor = 60 * 1000;
 
@@ -131,22 +128,9 @@ module.exports = NodeHelper.create({
                 // Delay calculation
                 let delayms = Math.abs(plannedDepartureDate - realtimeDepartureDate);
                 let delay = Math.floor(delayms / delayFactor);
-                
-                console.log(delayms);
 
                 // Assign calculated delay to new introduced key-value pair
                 fetchedData.data.station.journeys.elements[i].delay = delay;
-            }
-
-            // Log fetched data
-            for (let i = 0; i < numDepartures; i++) {
-                let c = fetchedData.data.station.journeys.elements[i];
-                let t = c.stops[0].plannedDeparture.isoString;
-                let d = c.stops[0].destinationLabel;
-                let l = c.line.id.split("-")[1];
-                let p = c.stops[0].pole.platform.label;
-                let delay = c.stops[0].delay;
-                console.log(t, "\t", l, "\t", p, "\t", delay, "\t", d);
             }
             // Set flag to check whether a previous fetch was successful
             this.previousFetchOk = true;
@@ -158,38 +142,26 @@ module.exports = NodeHelper.create({
             setTimeout(this.getData.bind(this), (this.config.updateInterval));
 
         }).catch((error) => {
-            // If there is "only" a apiKey given in the configuration,
-            // tell the user to update the key (since it is expired).
-            console.log("Your apiKey expired... Trying to generate a new one...\n", error);
             const clientID = this.config.clientID;
             const clientSecret = this.config.clientSecret;
             const oAuthURL = this.config.oAuthURL;
             const resourceID = this.config.resourceID;
             const previousFetchOk = this.previousFetchOk;
 
-            console.log(previousFetchOk);
-
             if (clientID && clientSecret && oAuthURL && resourceID && previousFetchOk) {
                 // Reset previousFetchOk, since there was an error (key expired (?))
                 this.previousFetchOk = false;
-                console.log("Got credentials...");
-                // Update apiKey with given credentials
-                console.log("Create new apiKey...");
                 this.createToken(oAuthURL, clientID, clientSecret, resourceID).then(key => {
                     // Renew apiKey
-                    console.log("Got new apiKey...");
                     this.config.apiKey = key;
 
                     // Renew client
-                    console.log("Renew client...");
                     this.client = this.authenticate(this.config.apiKey);
 
                     // Fetch new data from RNV-Server
                     this.getData.bind(this);
                 });
             } else {
-                console.log("Error trying to generate a new apiKey. Please manually update your apiKey.");
-                console.log("Error while querying data from server:\n", error);
                 // Create error return value
                 const errValue = 1;
                 // And send socket notification back to front-end to display the / an error...

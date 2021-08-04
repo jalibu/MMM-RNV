@@ -134,9 +134,6 @@ Module.register("MMM-RNV",{
             let plannedDepartureDate = new Date(plannedDepartureIsoString);
             let plannedDeparture = plannedDepartureDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit', hour12: false});
 
-            // Log
-            console.log(plannedDepartureIsoString, line, platform, delay, destination);
-
             // Time
             let dataCellTime = document.createElement("td");
             dataCellTime.className = "data";
