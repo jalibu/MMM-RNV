@@ -15,8 +15,6 @@ const { setContext } = require('apollo-link-context');
 const gql = require('graphql-tag');
 const fetch = require('node-fetch');
 
-const Log = require('logger');
-
 module.exports = NodeHelper.create({
     start: function() {
         this.config = null;
@@ -33,10 +31,10 @@ module.exports = NodeHelper.create({
             this.config = payload;
 
             if (!this.config.apiKey) {
-                const oAuthURL = this.config.oAuthURL;
                 const clientID = this.config.clientID;
                 const clientSecret = this.config.clientSecret;
                 const resourceID = this.config.resourceID;
+                const oAuthURL = this.config.oAuthURL;
                 // Create apiKey from given credentials
                 this.config.apiKey = await this.createToken(oAuthURL, clientID, clientSecret, resourceID);
             }
@@ -148,8 +146,8 @@ module.exports = NodeHelper.create({
             // tell the user to update the key (since it is expired).
             const clientID = this.config.clientID;
             const clientSecret = this.config.clientSecret;
-            const oAuthURL = this.config.oAuthURL;
             const resourceID = this.config.resourceID;
+            const oAuthURL = this.config.oAuthURL;
             const previousFetchOk = this.previousFetchOk;
 
             if (clientID && clientSecret && oAuthURL && resourceID && previousFetchOk) {

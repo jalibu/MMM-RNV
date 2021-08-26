@@ -36,10 +36,9 @@ The table below lists all possible configuration options.
                 apiKey: 'Enter your apiKey here',
                 // or
                 clientID: 'Enter your @clientID here',
+                tenantID: 'Enter your @tenantID here',
                 clientSecret: 'Enter your @clientSecret here',
                 resourceID: 'Enter your @resource here',
-                oAuthURL: 'Enter your @scope URL here'
-
             }
         }
     ]
@@ -53,12 +52,12 @@ The following configuration options can be set and/or changed:
 
 | Option | Type | Default | Description | Given names from RNV |
 | ---- | ---- | ---- | ---- | ---- |
-| `apiKey` | String | "" | Your personal API Key | - |
+| `apiKey` | `string` | `""` | Your personal API Key | - |
 | or |
-| `clientID`| String | "" | Your client ID | @clientID |
-| `clientSecret` | String | "" | Your client secret | @clientSecret |
-| `resourceID`| String | "" | Your resourceID | @resource |
-| `oAuthURL` | String | "" | URL to authentication site to generate the access token | @scope |
+| `clientID`| `string` | `""` | Your client ID | @clientID |
+| `tenantID` | `string` | `""`| Your tenant ID | @tenantID |
+| `clientSecret` | `string` | `""` | Your client secret | @clientSecret |
+| `resourceID`| `string` | `""` | Your resourceID | @resource |
 
 The remaining data and credentials, provided by the RNV, is not needed.
 
@@ -66,8 +65,8 @@ The remaining data and credentials, provided by the RNV, is not needed.
 
 | Option | Type | Default | Description |
 | ---- | ---- | ---- | ---- |
-| `header` | String | "RNV Abfahrtsmonitor" | Header which will be displayed |
-| `stationID` | String | "2417" | ID for Mannheim HBF |
-| `numJourneys` | String | "10" | Number of shown departures. |
-| `updateInterval` | String | "60000" (1 minute) | How often the table shall be updated [milliseconds] |
-| `animationSpeed` | String | "2000" (2 seconds)| Animation speed to fade in the module on startup [milliseconds] |
+| `header` | `string` | `"RNV Abfahrtsmonitor"` | Header which will be displayed |
+| `stationID` | `string` | `"2417"` | ID for Mannheim HBF |
+| `numJourneys` | `string` | `"10"` | Number of shown departures. |
+| `updateInterval` | `string` | `"60000"` | How often the table shall be updated [milliseconds] (1 minute) |
+| `animationSpeed` | `string` | `"2000"`| Animation speed to fade in the module on startup [milliseconds] (2 seconds) |

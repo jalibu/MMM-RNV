@@ -10,6 +10,7 @@ Module.register("MMM-RNV",{
    defaults: {
         header: "RNV Abfahrtsmonitor",
         animationSpeed: 2 * 1000, // 2 seconds
+        updateInterval: 1 * 60 * 1000, // every 1 minute
         stationID: "2417",
         numJourneys: "10",
         apiKey: "",
@@ -17,8 +18,8 @@ Module.register("MMM-RNV",{
         resourceID: "",
         clientSecret: "",
         oAuthURL: "",
+        tenantID: "",
         clientAPIURL: "https://graphql-sandbox-dds.rnv-online.de",
-        updateInterval: 1 * 60 * 1000, // every 1 minute
         icon: {
             "STRASSENBAHN" : "fas fa-train",
             "STADTBUS" : "fas fa-bus"
@@ -32,8 +33,10 @@ Module.register("MMM-RNV",{
         this.credentials = false;
         this.fetchedData = null;
 
-        if ( (this.config.apiKey) || (this.config.clientID && this.config.clientSecret && this.config.oAuthURL && this.config.resourceID) ) {
+        if ( (this.config.apiKey) || (this.config.clientID && this.config.clientSecret && this.config.tenantID && this.config.resourceID) ) {
             this.credentials = true;
+            // Build oAuthURL based on given tenantID.
+            this.config.oAuthURL = "https://login.microsoftonline.com/" + this.config.tenantID + "/oauth2/token";
             this.sendSocketNotification("SET_CONFIG", this.config);
         }
     },
