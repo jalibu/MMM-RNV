@@ -15,6 +15,8 @@ const { setContext } = require('apollo-link-context');
 const gql = require('graphql-tag');
 const fetch = require('node-fetch');
 
+const Log = require('logger');
+
 module.exports = NodeHelper.create({
     start: function() {
         this.config = null;
