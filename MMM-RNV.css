@@ -5,41 +5,55 @@
  * MIT Licensed.
  */
 
- #RNVTable {
-     width: 100%;
- }
-
-.RNVTableHeader {
-    text-align: left;
-    padding: 0px;
-}
-
-.time {
+.MMM-RNV .departure {
     text-align: left;
 }
 
-.Direction {
-    width: 50%;
-    text-align: left;
+.MMM-RNV .line {
+    text-align: center;
 }
 
-.delay {
-    padding-left: 10px;
-    text-align: left;
-}
- 
-.late {
-    color: #FF0000;
+.MMM-RNV .direction {
+    text-align: center;
 }
 
-.early {
-    color: #00FF00;
+.MMM-RNV .platform {
+    text-align: right;
 }
 
-.icon {
+.MMM-RNV .time {
+    text-align: right;
+    padding-left: 5px;
     padding-right: 10px;
 }
 
-.data {
+.MMM-RNV .delay {
+    padding-left: 10px;
+    text-align: left;
+}
+
+.MMM-RNV .line {
+    text-align: right;
+}
+
+.MMM-RNV .icon {
+    padding-right: 10px;
     padding-left: 5px;
+}
+
+.MMM-RNV .direction {
+    width: 50%;
+    text-align: center;
+}
+
+.MMM-RNV .platform {
+    text-align: center;
+}
+
+.MMM-RNV .early {
+    color: #00FF00;
+}
+
+.MMM-RNV .late {
+    color: #FF0000;
 }

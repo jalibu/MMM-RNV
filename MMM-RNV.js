@@ -50,6 +50,13 @@ Module.register("MMM-RNV",{
     getScripts: function() {
         return [];
     },
+
+    // Define required translations.
+    getTranslations: function() {
+        return {
+            de: "translations/de.json"
+        }
+    },
     
     // Define header.
     getHeader: function() {
@@ -84,26 +91,27 @@ Module.register("MMM-RNV",{
 
         // Create dom table
         const table = document.createElement("table");
+        table.className = "MMM-RNV light small";
         table.id = "RNVTable";
-        table.className = "light small";
-
+        
         const tableHead = document.createElement("tr");
 
         const tableHeadTime = document.createElement("th");
-        tableHeadTime.innerHTML = "Abfahrt";
-        tableHeadTime.className = "RNVTableHeader Departure";
+        tableHeadTime.innerHTML = this.translate("DEPARTURE");
+        tableHeadTime.className = "MMM-RNV header departure";
 
         const tableHeadLine = document.createElement("th");
-        tableHeadLine.innerHTML = "Linie";
-        tableHeadLine.className = "RNVTableHeader Line";
+        tableHeadLine.innerHTML = this.translate("LINE");
+        tableHeadLine.className = "MMM-RNV line";
+        tableHeadLine.colSpan = "2";
 
         const tableHeadDestination = document.createElement("th");
-        tableHeadDestination.innerHTML = "Richtung";
-        tableHeadDestination.className = "RNVTableHeader Direction";
+        tableHeadDestination.innerHTML = this.translate("DIRECTION");
+        tableHeadDestination.className = "MMM-RNV direction";
 
         const tableHeadPlatform = document.createElement("th");
-        tableHeadPlatform.innerHTML = "Gleis";
-        tableHeadPlatform.className = "RNVTableHeader Platform";
+        tableHeadPlatform.innerHTML = this.translate("PLATFORM");
+        tableHeadPlatform.className = "MMM-RNV platform";
 
         tableHead.appendChild(tableHeadTime);
         tableHead.appendChild(tableHeadLine);
@@ -115,7 +123,7 @@ Module.register("MMM-RNV",{
         // Horizontal rule after table header
         const hruleRow = document.createElement("tr");
         const hruleData = document.createElement("td");
-        hruleData.colSpan = 4;
+        hruleData.colSpan = 5;
         hruleData.innerHTML = "<hr>";
 
         hruleRow.appendChild(hruleData);
@@ -139,13 +147,12 @@ Module.register("MMM-RNV",{
 
             // Time
             let dataCellTime = document.createElement("td");
-            dataCellTime.className = "data";
-            dataCellTime.classList.add("time");
+            dataCellTime.className = "MMM-RNV data time";
             dataCellTime.innerHTML = plannedDeparture;
 
             // -- Delay
             let dataCellTimeDelay = document.createElement("span");
-            dataCellTimeDelay.className = "small delay";
+            dataCellTimeDelay.className = "MMM-RNV small delay";
             if (delay > 0) {
                 dataCellTimeDelay.innerHTML = "+ " + delay;
                 dataCellTimeDelay.classList.add("late");
@@ -161,30 +168,33 @@ Module.register("MMM-RNV",{
             
             // Line
             let dataCellLine = document.createElement("td");
-            dataCellLine.className = "data";
+            dataCellLine.className = "MMM-RNV data line";
+            dataCellLine.innerHTML = line;
+
             // -- Span
             let dataCellLineSpan = document.createElement("span");
-            dataCellLineSpan.className = "icon";
+            dataCellLineSpan.className = "MMM-RNV data time icon";
             // ---- Icon
             let dataCellLineIcon = document.createElement("i");
             dataCellLineIcon.className = this.config.icon[type];
-
             dataCellLineSpan.appendChild(dataCellLineIcon);    
-            dataCellLine.innerHTML = line;
+
+            
             
             // Direction
             let dataCellDirection = document.createElement("td");
-            dataCellDirection.className = "data";
+            dataCellDirection.className = "MMM-RNV data direction";
             dataCellDirection.innerHTML = destination;
 
             // Platform
             let dataCellPlatform = document.createElement("td");
-            dataCellPlatform.className = "data";
+            dataCellPlatform.className = "MMM-RNV data platform";
             dataCellPlatform.innerHTML = platform;
             
             let dataRow = document.createElement("tr");
             dataRow.appendChild(dataCellTime);
             dataRow.appendChild(dataCellLine);
+            dataRow.appendChild(dataCellLineSpan);
             dataRow.appendChild(dataCellDirection);
             dataRow.appendChild(dataCellPlatform);
             
