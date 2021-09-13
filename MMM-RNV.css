@@ -5,55 +5,18 @@
  * MIT Licensed.
  */
 
-.MMM-RNV .departure {
+.MMM-RNV {
     text-align: left;
 }
 
-.MMM-RNV .line {
-    text-align: center;
+table.rnv-schedule{
+    border-spacing: 0.5em;
 }
 
-.MMM-RNV .direction {
-    text-align: center;
+.rnv-delay {
+    color: red;
 }
 
-.MMM-RNV .platform {
-    text-align: right;
-}
-
-.MMM-RNV .time {
-    text-align: right;
-    padding-left: 5px;
-    padding-right: 10px;
-}
-
-.MMM-RNV .delay {
-    padding-left: 10px;
-    text-align: left;
-}
-
-.MMM-RNV .line {
-    text-align: right;
-}
-
-.MMM-RNV .icon {
-    padding-right: 10px;
-    padding-left: 5px;
-}
-
-.MMM-RNV .direction {
-    width: 50%;
-    text-align: center;
-}
-
-.MMM-RNV .platform {
-    text-align: center;
-}
-
-.MMM-RNV .early {
-    color: #00FF00;
-}
-
-.MMM-RNV .late {
-    color: #FF0000;
+.rnv-delay.rnv-early {
+    color: green;
 }

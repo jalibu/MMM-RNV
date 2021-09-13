@@ -4,31 +4,37 @@
  * By Julian Dinter
  * MIT Licensed.
  */
-
+import Utils from './Utils'
 import { Config } from '../types/Config'
 
 // Global or injected variable declarations
 declare const Log: any
+declare const moment: any
 
 Module.register<Config>('MMM-RNV', {
   // Default module config.
   defaults: {
-    animationSpeed: 2 * 1000, // 2 seconds
-    updateInterval: 1 * 60 * 1000, // every 1 minute
-    stationID: '2417',
-    numJourneys: 10,
-    apiKey: '',
-    clientID: '',
-    resourceID: '',
-    clientSecret: '',
-    oAuthURL: '',
-    tenantID: '',
-    clientAPIURL: 'https://graphql-sandbox-dds.rnv-online.de',
-    icon: {
+    animationSpeedMs: 2 * 1000, // 2 seconds
+    updateIntervalMs: 1 * 10 * 1000, // every 1 minute
+    stationId: '2417',
+    showLineColors: true,
+    maxResults: 10,
+    apiKey: null,
+    clientId: null,
+    resourceId: null,
+    clientSecret: null,
+    oAuthUrl: null,
+    tenantId: null,
+    clientApiUrl: 'https://graphql-sandbox-dds.rnv-online.de',
+    timeformat: 'HH:mm',
+    showPlatform: false,
+    showTableHeadersAsSymbols: false,
+    icons: {
       STRASSENBAHN: 'fas fa-train',
       STADTBUS: 'fas fa-bus'
     }
   },
+
 
   // Define start sequence.
   start() {
@@ -39,11 +45,11 @@ Module.register<Config>('MMM-RNV', {
 
     if (
       this.config.apiKey ||
-      (this.config.clientID && this.config.clientSecret && this.config.tenantID && this.config.resourceID)
+      (this.config.clientId && this.config.clientSecret && this.config.tenantId && this.config.resourceId)
     ) {
       this.credentials = true
       // Build oAuthURL based on given tenantID.
-      this.config.oAuthURL = `https://login.microsoftonline.com/${this.config.tenantID}/oauth2/token`
+      this.config.oAuthUrl = `https://login.microsoftonline.com/${this.config.tenantId}/oauth2/token`
 
       this.sendSocketNotification('SET_CONFIG', this.config)
     }
@@ -52,6 +58,10 @@ Module.register<Config>('MMM-RNV', {
   // Define required styles.
   getStyles() {
     return ['MMM-RNV.css', 'font-awesome.css']
+  },
+
+  getScripts() {
+    return ['moment.js']
   },
 
   // Define required translations.
@@ -66,8 +76,12 @@ Module.register<Config>('MMM-RNV', {
   },
 
   getTemplateData() {
+    const utils = new Utils(this.config)
     return {
-      departures: this._departures
+      departures: this._departures,
+      config: this.config,
+      utils,
+      moment
     }
   },
 
@@ -79,7 +93,7 @@ Module.register<Config>('MMM-RNV', {
       this.hasLoaded = true
 
       // Update dom with given animation speed
-      this.updateDom(this.hasLoaded ? 0 : this.config.animationSpeed)
+      this.updateDom(this.hasLoaded ? 0 : this.config.animationSpeedMs)
     } else if (notification == 'ERROR') {
       // TODO: Update front-end to display specific error.
     }

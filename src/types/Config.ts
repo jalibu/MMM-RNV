@@ -1,16 +1,20 @@
 export type Config = {
-  animationSpeed: number
-  updateInterval: number
-  stationID: string
-  numJourneys: number
+  animationSpeedMs: number
+  updateIntervalMs: number
+  stationId: string
+  maxResults: number
   apiKey: string
-  clientID: string
-  resourceID: string
+  clientId: string
+  resourceId: string
   clientSecret: string
-  oAuthURL: string
-  tenantID: string
-  clientAPIURL: string
-  icon: {
+  oAuthUrl: string
+  tenantId: string
+  clientApiUrl: string
+  timeformat: string
+  showPlatform: boolean
+  showLineColors: boolean
+  showTableHeadersAsSymbols: boolean
+  icons: {
     STRASSENBAHN: string
     STADTBUS: string
   }

@@ -19,39 +19,58 @@ module.exports = NodeHelper.create({
   start() {
     this.config = null
     this.client = null
+    this.schedule = null
+    this.colorCodes = []
     this.previousFetchOk = false
+    this.getColorCodes()
+  },
+
+  async getColorCodes(){
+    try {
+      const results = await fetch("https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen-farben.json")
+      const json = await results.json()
+      this.colorCodes = json.lineGroups
+    } catch (err){
+      console.warn("Could not request color codes", err)
+    }
   },
 
   async socketNotificationReceived(notification, payload) {
     if (notification == 'SET_CONFIG') {
       const moduleConfig = payload as Config
-
       // Create apiKey from given credentials
       if (!moduleConfig.apiKey) {
         moduleConfig.apiKey = await this.createToken(
-          moduleConfig.oAuthURL,
-          moduleConfig.clientID,
+          moduleConfig.oAuthUrl,
+          moduleConfig.clientId,
           moduleConfig.clientSecret,
-          moduleConfig.resourceID
+          moduleConfig.resourceId
         )
       }
 
       this.config = moduleConfig
 
       // Authenticate by OAuth
-      this.client = this.createClient()
+      if(!this.client){
+        this.client = this.createClient()
+      }
+
+      // Retrieve data from RNV-Server
+      this.getData()
+      if(!this.schedule){
+        this.schedule = setInterval(this.getData.bind(this), this.config.updateIntervalMs)
+      }
     }
 
-    // Retrieve data from RNV-Server
-    this.getData()
+    
   },
 
   async getData() {
     const query = `query {
-            station(id:"${this.config.stationID}") {
+            station(id:"${this.config.stationId}") {
                 hafasID
                 longName
-                journeys(startTime: "${new Date().toISOString()}" first: ${this.config.numJourneys}) {
+                journeys(startTime: "${new Date().toISOString()}" first: ${this.config.maxResults}) {
                     totalCount
                     elements {
                         ... on Journey {
@@ -59,7 +78,7 @@ module.exports = NodeHelper.create({
                                 id
                             }
                             type
-                            stops(onlyHafasID: "${this.config.stationID}") {
+                            stops(onlyHafasID: "${this.config.stationId}") {
                                 pole {
                                     platform {
                                         type
@@ -116,12 +135,15 @@ module.exports = NodeHelper.create({
           console.warn('There was a problem calculating the delay', err)
         }
 
+        const line = apiDeparture.line.id.split('-')[1]
         const departure: Departure = {
-          line: apiDeparture.line.id.split('-')[1],
+          line,
           destination: apiDeparture.stops[0].destinationLabel,
           departure: plannedDepartureDate.getTime(),
           delayInMin: delayInMinutes,
-          platform: apiDeparture.stops[0].pole.platform.label
+          platform: apiDeparture.stops[0].pole.platform.label,
+          type: apiDeparture.type,
+          color: this.colorCodes.find(code => code.id === line)
         }
 
         departures.push(departure)
@@ -133,12 +155,13 @@ module.exports = NodeHelper.create({
       // Send data to front-end
       this.sendSocketNotification('DATA', departures)
     } catch (err) {
+      console.log("err", err)
       // If there is "only" a apiKey given in the configuration,
       // tell the user to update the key (since it is expired).
-      const clientID = this.config.clientID
+      const clientID = this.config.clientId
       const clientSecret = this.config.clientSecret
-      const resourceID = this.config.resourceID
-      const oAuthURL = this.config.oAuthURL
+      const resourceID = this.config.resourceId
+      const oAuthURL = this.config.oAuthUrl
       const previousFetchOk = this.previousFetchOk
 
       if (clientID && clientSecret && oAuthURL && resourceID && previousFetchOk) {
@@ -162,9 +185,6 @@ module.exports = NodeHelper.create({
         this.sendSocketNotification('ERROR', errValue)
       }
     }
-
-    // Set timeout to continuously fetch new data from RNV-Server
-    setTimeout(this.getData.bind(this), this.config.updateInterval)
   },
 
   // Create access token if there is none given in the configuration file
@@ -192,7 +212,7 @@ module.exports = NodeHelper.create({
 
   createClient() {
     const token = this.config.apiKey
-    const httpLink = new HttpLink({ uri: this.config.clientAPIURL, credentials: 'same-origin', fetch: fetch })
+    const httpLink = new HttpLink({ uri: this.config.clientApiUrl, credentials: 'same-origin', fetch: fetch })
 
     const middlewareAuthLink = setContext(async (_, { headers }) => {
       return {
