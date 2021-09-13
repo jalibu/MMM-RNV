@@ -1,7 +1,7 @@
 {
   "name": "mmm-rnv",
   "version": "1.0.0",
-  "description": "",
+  "description": "This module for the MagicMirror² platform monitors a given station in the RNV traffic network.",
   "main": "MMM-RNV.js",
   "scripts": {
     "build": "rollup -c",
@@ -18,7 +18,8 @@
     "apollo-client": "^2.6.10",
     "apollo-link-context": "^1.0.20",
     "apollo-link-http": "^1.5.17",
-    "graphql-tag": "^2.11.0",
+    "graphql": "^15.5.3",
+    "graphql-tag": "^2.12.5",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {

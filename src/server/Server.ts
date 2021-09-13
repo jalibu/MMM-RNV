@@ -1,7 +1,7 @@
 import * as NodeHelper from 'node_helper'
 import { ApolloClient } from 'apollo-client'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import { HttpLink } from 'apollo-link-http'
+import { createHttpLink } from 'apollo-link-http'
 import { setContext } from 'apollo-link-context'
 import gql from 'graphql-tag'
 import fetch from 'node-fetch'
@@ -23,7 +23,7 @@ module.exports = NodeHelper.create({
       const results = await fetch(
         'https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen-farben.json'
       )
-      const json = await results.json()
+      const json = await results.json() as any
       this.colorCodes = json.lineGroups
     } catch (err) {
       console.warn('Could not request color codes', err)
@@ -203,7 +203,7 @@ module.exports = NodeHelper.create({
     })
 
     if (!response.ok) {
-      console.error('Error while creating access token.', response.error)
+      console.error('Error while creating access token.', response.statusText)
       return null
     }
     const json = await response.json()
@@ -213,7 +213,7 @@ module.exports = NodeHelper.create({
 
   createClient() {
     const token = this.config.apiKey
-    const httpLink = new HttpLink({ uri: this.config.clientApiUrl, credentials: 'same-origin', fetch: fetch })
+    const httpLink = createHttpLink({ uri: this.config.clientApiUrl, fetch: fetch });
 
     const middlewareAuthLink = setContext(async (_, { headers }) => {
       return {
