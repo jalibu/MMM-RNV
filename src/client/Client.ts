@@ -13,7 +13,6 @@ declare const Log: any
 Module.register<Config>('MMM-RNV', {
   // Default module config.
   defaults: {
-    header: 'RNV Abfahrtsmonitor',
     animationSpeed: 2 * 1000, // 2 seconds
     updateInterval: 1 * 60 * 1000, // every 1 minute
     stationID: '2417',
@@ -44,7 +43,8 @@ Module.register<Config>('MMM-RNV', {
     ) {
       this.credentials = true
       // Build oAuthURL based on given tenantID.
-      this.config.oAuthURL = 'https://login.microsoftonline.com/' + this.config.tenantID + '/oauth2/token'
+      this.config.oAuthURL = `https://login.microsoftonline.com/${this.config.tenantID}/oauth2/token`
+
       this.sendSocketNotification('SET_CONFIG', this.config)
     }
   },
@@ -54,23 +54,12 @@ Module.register<Config>('MMM-RNV', {
     return ['MMM-RNV.css', 'font-awesome.css']
   },
 
-  // Define required scripts.
-  getScripts() {
-    return []
-  },
-
   // Define required translations.
   getTranslations() {
     return {
       de: 'translations/de.json'
     }
   },
-
-  // Define header.
-  getHeader() {
-    return this.config.header
-  },
-
 
   getTemplate() {
     return 'templates/MMM-RNV.njk'
@@ -85,15 +74,12 @@ Module.register<Config>('MMM-RNV', {
   // Override socket notification handler.
   socketNotificationReceived(notification, payload) {
     if (notification == 'DATA') {
-      console.log(payload)
-      let animationSpeed = this.config.animationSpeed
-      if (this.hasLoaded) {
-        animationSpeed = 0
-      }
+      console.log('Departures', payload)
       this._departures = payload
       this.hasLoaded = true
+
       // Update dom with given animation speed
-      this.updateDom(animationSpeed)
+      this.updateDom(this.hasLoaded ? 0 : this.config.animationSpeed)
     } else if (notification == 'ERROR') {
       // TODO: Update front-end to display specific error.
     }

@@ -1,5 +1,4 @@
 export type Config = {
-  header: string
   animationSpeed: number
   updateInterval: number
   stationID: string

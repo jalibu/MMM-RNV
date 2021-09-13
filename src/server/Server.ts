@@ -47,15 +47,11 @@ module.exports = NodeHelper.create({
   },
 
   async getData() {
-    const now = new Date().toISOString()
-    const numJourneys = this.config.numJourneys
-    const stationID = this.config.stationID
-
     const query = `query {
-            station(id:"${stationID}") {
+            station(id:"${this.config.stationID}") {
                 hafasID
                 longName
-                journeys(startTime: "${now}" first: ${numJourneys}) {
+                journeys(startTime: "${new Date().toISOString()}" first: ${this.config.numJourneys}) {
                     totalCount
                     elements {
                         ... on Journey {
@@ -63,7 +59,7 @@ module.exports = NodeHelper.create({
                                 id
                             }
                             type
-                            stops(onlyHafasID: "${stationID}") {
+                            stops(onlyHafasID: "${this.config.stationID}") {
                                 pole {
                                     platform {
                                         type
@@ -108,7 +104,6 @@ module.exports = NodeHelper.create({
       })
 
       for (const apiDeparture of apiDepartures) {
-
         const plannedDepartureDate = new Date(apiDeparture.stops[0].plannedDeparture.isoString)
 
         // Delay calculation
