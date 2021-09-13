@@ -1,0 +1,25 @@
+{% if departures.length > 0 %}
+   <div>
+      <table class="light small">
+         <tr>
+            <th class="rnv-header departure">Abfahrt</th>
+            <th class="rnv-line" colspan="2">Linie</th>
+            <th class="rnv-destination">Richtung</th>
+            <th class="rnv-platform">Gleis</th>
+         </tr>
+         {% for departure in departures %}
+         <tr>
+            <td class="rnv-data-time">{{ departure.departure }} {% if departure.delayInMin > 0 %}<span class="small delay">+ 0</span>{% endif %}</td>
+            <td class="rnv-data-line">{{ departure.line }}</td>
+            <span class="rnv-data-time-icon"><i class="fas fa-bus"></i></span>
+            <td class="rnv-data-destination">{{ departure.destination }}</td>
+            <td class="rnv-data-platform">{{ departure.platform }}</td>
+         </tr>
+         {% endfor %}
+      </table>
+   </div>
+ {% else %}
+     <div class="dimmed light small">
+      {{ "LOADING" | translate | safe }}
+    </div>
+{% endif %}

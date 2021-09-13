@@ -36,7 +36,7 @@ Module.register<Config>('MMM-RNV', {
     Log.info('Starting module: ' + this.name)
     this.hasLoaded = false
     this.credentials = false
-    this.fetchedData = null
+    this._departures = null
 
     if (
       this.config.apiKey ||
@@ -71,159 +71,26 @@ Module.register<Config>('MMM-RNV', {
     return this.config.header
   },
 
-  // Override dom generator.
-  getDom() {
-    const wrapper = document.createElement('div')
 
-    if (!this.credentials) {
-      wrapper.innerHTML = 'There are no <i>RNV Credentials</i> in config file set.'
-      wrapper.className = 'light small dimmed'
-      return wrapper
+  getTemplate() {
+    return 'templates/MMM-RNV.njk'
+  },
+
+  getTemplateData() {
+    return {
+      departures: this._departures
     }
-    if (this.config.stationID == '') {
-      wrapper.innerHTML = 'No <i>stationID</i> in config file set.'
-      wrapper.className = 'light small dimmed'
-      return wrapper
-    }
-    if (!this.hasLoaded) {
-      wrapper.innerHTML = 'Loading...'
-      wrapper.className = 'light small dimmed'
-      return wrapper
-    }
-
-    if (this.hasLoaded && this.fetchedData.length == 0) {
-      wrapper.innerHTML = 'No data available'
-      wrapper.className = 'light small dimmed'
-      return wrapper
-    }
-
-    // Create dom table
-    const table = document.createElement('table')
-    table.className = 'MMM-RNV light small'
-    table.id = 'RNVTable'
-
-    const tableHead = document.createElement('tr')
-
-    const tableHeadTime = document.createElement('th')
-    tableHeadTime.innerHTML = this.translate('DEPARTURE')
-    tableHeadTime.className = 'MMM-RNV header departure'
-
-    const tableHeadLine = document.createElement('th')
-    tableHeadLine.innerHTML = this.translate('LINE')
-    tableHeadLine.className = 'MMM-RNV line'
-    tableHeadLine.colSpan = 2
-
-    const tableHeadDestination = document.createElement('th')
-    tableHeadDestination.innerHTML = this.translate('DIRECTION')
-    tableHeadDestination.className = 'MMM-RNV direction'
-
-    const tableHeadPlatform = document.createElement('th')
-    tableHeadPlatform.innerHTML = this.translate('PLATFORM')
-    tableHeadPlatform.className = 'MMM-RNV platform'
-
-    tableHead.appendChild(tableHeadTime)
-    tableHead.appendChild(tableHeadLine)
-    tableHead.appendChild(tableHeadDestination)
-    tableHead.appendChild(tableHeadPlatform)
-
-    table.appendChild(tableHead)
-
-    // Horizontal rule after table header
-    const hruleRow = document.createElement('tr')
-    const hruleData = document.createElement('td')
-    hruleData.colSpan = 5
-    hruleData.innerHTML = '<hr>'
-
-    hruleRow.appendChild(hruleData)
-    table.appendChild(hruleRow)
-
-    const numDepartures = this.fetchedData.length
-    // Iterating over received data
-    for (let i = 0; i < numDepartures; i++) {
-      let currentDeparture = this.fetchedData[i]
-      let line = currentDeparture.line.id.split('-')[1]
-      let type = currentDeparture.type
-
-      let destination = currentDeparture.stops[0].destinationLabel
-      let platform = currentDeparture.stops[0].pole.platform.label
-      let delay = currentDeparture.stops[0].delay
-
-      let departureTimes = currentDeparture.stops[0]
-      let plannedDepartureIsoString = departureTimes.plannedDeparture.isoString
-      let plannedDepartureDate = new Date(plannedDepartureIsoString)
-      let plannedDeparture = plannedDepartureDate.toLocaleTimeString('de-DE', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      })
-
-      // Time
-      let dataCellTime = document.createElement('td')
-      dataCellTime.className = 'MMM-RNV data time'
-      dataCellTime.innerHTML = plannedDeparture
-
-      // -- Delay
-      let dataCellTimeDelay = document.createElement('span')
-      dataCellTimeDelay.className = 'MMM-RNV small delay'
-      if (delay > 0) {
-        dataCellTimeDelay.innerHTML = '+ ' + delay
-        dataCellTimeDelay.classList.add('late')
-      } else if (delay < 0) {
-        dataCellTimeDelay.innerHTML = '- ' + delay
-        dataCellTimeDelay.classList.add('early')
-      } else {
-        dataCellTimeDelay.innerHTML = '+ ' + delay
-        dataCellTimeDelay.style.visibility = 'hidden'
-      }
-
-      dataCellTime.appendChild(dataCellTimeDelay)
-
-      // Line
-      let dataCellLine = document.createElement('td')
-      dataCellLine.className = 'MMM-RNV data line'
-      dataCellLine.innerHTML = line
-
-      // -- Span
-      let dataCellLineSpan = document.createElement('span')
-      dataCellLineSpan.className = 'MMM-RNV data time icon'
-      // ---- Icon
-      let dataCellLineIcon = document.createElement('i')
-      dataCellLineIcon.className = this.config.icon[type]
-      dataCellLineSpan.appendChild(dataCellLineIcon)
-
-      // Direction
-      let dataCellDirection = document.createElement('td')
-      dataCellDirection.className = 'MMM-RNV data direction'
-      dataCellDirection.innerHTML = destination
-
-      // Platform
-      let dataCellPlatform = document.createElement('td')
-      dataCellPlatform.className = 'MMM-RNV data platform'
-      dataCellPlatform.innerHTML = platform
-
-      let dataRow = document.createElement('tr')
-      dataRow.appendChild(dataCellTime)
-      dataRow.appendChild(dataCellLine)
-      dataRow.appendChild(dataCellLineSpan)
-      dataRow.appendChild(dataCellDirection)
-      dataRow.appendChild(dataCellPlatform)
-
-      table.appendChild(dataRow)
-    }
-    wrapper.appendChild(table)
-
-    // Return the wrapper to the dom.
-    return wrapper
   },
 
   // Override socket notification handler.
   socketNotificationReceived(notification, payload) {
     if (notification == 'DATA') {
+      console.log(payload)
       let animationSpeed = this.config.animationSpeed
       if (this.hasLoaded) {
         animationSpeed = 0
       }
-      this.fetchedData = payload
+      this._departures = payload
       this.hasLoaded = true
       // Update dom with given animation speed
       this.updateDom(animationSpeed)

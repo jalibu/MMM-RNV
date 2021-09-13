@@ -13,6 +13,7 @@ import { setContext } from 'apollo-link-context'
 import gql from 'graphql-tag'
 import fetch from 'node-fetch'
 import { Config } from '../types/Config'
+import { Departure } from '../types/Departure'
 
 module.exports = NodeHelper.create({
   start() {
@@ -91,46 +92,51 @@ module.exports = NodeHelper.create({
         }`
 
     try {
-      const fetchedData = await this.client.query({ query: gql(query) })
+      const departures: Departure[] = []
+      const apiResponse = await this.client.query({ query: gql(query) })
 
       // Remove elements where its depature time is equal to null
-      const journeys = fetchedData.data.station.journeys.elements.filter(
-        (journey) => journey.stops[0].plannedDeparture.isoString == null
+      const apiDepartures = apiResponse.data.station.journeys.elements.filter(
+        (journey) => journey.stops[0].plannedDeparture.isoString !== null
       )
 
       // Sorting fetched data based on the departure times
-      journeys.sort((a, b) => {
+      apiDepartures.sort((a, b) => {
         let depA = a.stops[0].plannedDeparture.isoString
         let depB = b.stops[0].plannedDeparture.isoString
         return depA < depB ? -1 : depA > depB ? 1 : 0
       })
 
-      // Delay
-      for (const journey of journeys) {
-        // Create new key-value pair, representing the current delay of the departure
-        journey.stops[0].delay = 0
-        // If there is no realtime departure data avaialble, skip delay calculation and continue with next departure
-        if (journey.stops[0].realtimeDeparture.isoString === null) {
-          continue
-        }
+      for (const apiDeparture of apiDepartures) {
 
-        const departureTimes = journey.stops[0]
-        const plannedDepartureDate = new Date(departureTimes.plannedDeparture.isoString)
-        const realtimeDepartureDate = new Date(departureTimes.realtimeDeparture.isoString)
+        const plannedDepartureDate = new Date(apiDeparture.stops[0].plannedDeparture.isoString)
 
         // Delay calculation
-        const delayInMs = Math.abs(plannedDepartureDate.getMilliseconds() - realtimeDepartureDate.getMilliseconds())
-        let delay = Math.floor((delayInMs / 60) * 1000)
+        let delayInMinutes = 0
+        try {
+          const realtimeDepartureDate = new Date(apiDeparture.stops[0].realtimeDeparture.isoString)
+          const delayInMs = Math.abs(plannedDepartureDate.getMilliseconds() - realtimeDepartureDate.getMilliseconds())
+          delayInMinutes = Math.floor((delayInMs / 60) * 1000)
+        } catch (err) {
+          console.warn('There was a problem calculating the delay', err)
+        }
 
-        // Assign calculated delay to new introduced key-value pair
-        journey.stops[0].delay = delay
+        const departure: Departure = {
+          line: apiDeparture.line.id.split('-')[1],
+          destination: apiDeparture.stops[0].destinationLabel,
+          departure: plannedDepartureDate.getTime(),
+          delayInMin: delayInMinutes,
+          platform: apiDeparture.stops[0].pole.platform.label
+        }
+
+        departures.push(departure)
       }
 
       // Set flag to check whether a previous fetch was successful
       this.previousFetchOk = true
 
       // Send data to front-end
-      this.sendSocketNotification('DATA', journeys)
+      this.sendSocketNotification('DATA', departures)
     } catch (err) {
       // If there is "only" a apiKey given in the configuration,
       // tell the user to update the key (since it is expired).
@@ -149,7 +155,7 @@ module.exports = NodeHelper.create({
           this.config.apiKey = key
 
           // Renew client
-          this.client = this.authenticate(this.config.apiKey)
+          this.client = this.createClient()
 
           // Fetch new data from RNV-Server
           this.getData()
@@ -185,7 +191,7 @@ module.exports = NodeHelper.create({
       return null
     }
     const json = await response.json()
-    
+
     return json['access_token']
   },
 
