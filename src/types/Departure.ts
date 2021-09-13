@@ -5,6 +5,7 @@ export type Departure = {
   delayInMin: number
   platform: string
   type: string
+  highlighted?: boolean
   color?: Color
 }
 

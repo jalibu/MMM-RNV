@@ -12,7 +12,7 @@ const bannerText = `/*! ********************************************************
 
   ${pkg.description}
 
-  (c) ${pkg.author}
+  (c) ${pkg.contributors}
   Licence: ${pkg.license}
 
   This file is auto-generated. Do not edit.
@@ -30,7 +30,15 @@ export default [
   },
   {
     input: './src/server/Server.ts',
-    external: ['node_helper', 'node-fetch'],
+    external: [
+      'node_helper',
+      'apollo-cache-inmemory',
+      'apollo-client',
+      'apollo-link-context',
+      'apollo-link-http',
+      'graphql-tag',
+      'node-fetch'
+    ],
     plugins: [typescript({ module: 'ESNext' }), terser(), banner2(() => bannerText)],
     output: {
       file: './node_helper.js',

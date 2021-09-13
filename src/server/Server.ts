@@ -1,10 +1,3 @@
-/* Magic Mirror
- * Module: MMM-RNV
- *
- * By Julian Dinter
- * MIT Licensed.
- */
-
 import * as NodeHelper from 'node_helper'
 import { ApolloClient } from 'apollo-client'
 import { InMemoryCache } from 'apollo-cache-inmemory'
@@ -25,13 +18,15 @@ module.exports = NodeHelper.create({
     this.getColorCodes()
   },
 
-  async getColorCodes(){
+  async getColorCodes() {
     try {
-      const results = await fetch("https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen-farben.json")
+      const results = await fetch(
+        'https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen-farben.json'
+      )
       const json = await results.json()
       this.colorCodes = json.lineGroups
-    } catch (err){
-      console.warn("Could not request color codes", err)
+    } catch (err) {
+      console.warn('Could not request color codes', err)
     }
   },
 
@@ -51,18 +46,16 @@ module.exports = NodeHelper.create({
       this.config = moduleConfig
 
       // Authenticate by OAuth
-      if(!this.client){
+      if (!this.client) {
         this.client = this.createClient()
       }
 
       // Retrieve data from RNV-Server
       this.getData()
-      if(!this.schedule){
+      if (!this.schedule) {
         this.schedule = setInterval(this.getData.bind(this), this.config.updateIntervalMs)
       }
     }
-
-    
   },
 
   async getData() {
@@ -70,7 +63,7 @@ module.exports = NodeHelper.create({
             station(id:"${this.config.stationId}") {
                 hafasID
                 longName
-                journeys(startTime: "${new Date().toISOString()}" first: ${this.config.maxResults}) {
+                journeys(startTime: "${new Date().toISOString()}" first: 50) {
                     totalCount
                     elements {
                         ... on Journey {
@@ -110,7 +103,7 @@ module.exports = NodeHelper.create({
       const departures: Departure[] = []
       const apiResponse = await this.client.query({ query: gql(query) })
 
-      // Remove elements where its depature time is equal to null
+      // Remove elements where depature time is not set
       const apiDepartures = apiResponse.data.station.journeys.elements.filter(
         (journey) => journey.stops[0].plannedDeparture.isoString !== null
       )
@@ -136,6 +129,10 @@ module.exports = NodeHelper.create({
         }
 
         const line = apiDeparture.line.id.split('-')[1]
+        if (this.config.excludeLines.includes(line)) {
+          continue
+        }
+
         const departure: Departure = {
           line,
           destination: apiDeparture.stops[0].destinationLabel,
@@ -143,10 +140,14 @@ module.exports = NodeHelper.create({
           delayInMin: delayInMinutes,
           platform: apiDeparture.stops[0].pole.platform.label,
           type: apiDeparture.type,
-          color: this.colorCodes.find(code => code.id === line)
+          highlighted: this.config.highlightLines.includes(line),
+          color: this.colorCodes.find((code) => code.id === line)
         }
 
         departures.push(departure)
+        if (departures.length === this.config.maxResults) {
+          break
+        }
       }
 
       // Set flag to check whether a previous fetch was successful
@@ -155,7 +156,7 @@ module.exports = NodeHelper.create({
       // Send data to front-end
       this.sendSocketNotification('DATA', departures)
     } catch (err) {
-      console.log("err", err)
+      console.log('err', err)
       // If there is "only" a apiKey given in the configuration,
       // tell the user to update the key (since it is expired).
       const clientID = this.config.clientId

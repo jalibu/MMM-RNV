@@ -1,9 +1,3 @@
-/* Magic Mirror
- * Module: MMM-RNV
- *
- * By Julian Dinter
- * MIT Licensed.
- */
 import Utils from './Utils'
 import { Config } from '../types/Config'
 
@@ -15,7 +9,7 @@ Module.register<Config>('MMM-RNV', {
   // Default module config.
   defaults: {
     animationSpeedMs: 2 * 1000, // 2 seconds
-    updateIntervalMs: 1 * 10 * 1000, // every 1 minute
+    updateIntervalMs: 1 * 60 * 1000, // every 1 minute
     stationId: '2417',
     showLineColors: true,
     maxResults: 10,
@@ -29,6 +23,8 @@ Module.register<Config>('MMM-RNV', {
     timeformat: 'HH:mm',
     showPlatform: false,
     showTableHeadersAsSymbols: false,
+    highlightLines: [],
+    excludeLines: [],
     icons: {
       STRASSENBAHN: 'fas fa-train',
       STADTBUS: 'fas fa-bus'

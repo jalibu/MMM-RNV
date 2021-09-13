@@ -14,6 +14,8 @@ export type Config = {
   showPlatform: boolean
   showLineColors: boolean
   showTableHeadersAsSymbols: boolean
+  highlightLines: string[]
+  excludeLines: string[]
   icons: {
     STRASSENBAHN: string
     STADTBUS: string
