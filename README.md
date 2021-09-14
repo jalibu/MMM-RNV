@@ -43,7 +43,7 @@ Contribution welcome.
                clientSecret: "",
                resourceId: "",
                tenantId: "",
-            }
+            },
             excludeLines: [], // example ["N1", "5"]
             highlightLines: [], // example ["1"]
             maxResults: 10,

@@ -1,6 +1,6 @@
 /*! *****************************************************************************
   mmm-rnv
-  Version 1.0.0
+  Version 1.0.1
 
   This module for the MagicMirror² platform monitors a given station in the RNV traffic network.
 
