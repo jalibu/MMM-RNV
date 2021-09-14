@@ -23,7 +23,7 @@ module.exports = NodeHelper.create({
       const results = await fetch(
         'https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen-farben.json'
       )
-      const json = await results.json() as any
+      const json = (await results.json()) as any
       this.colorCodes = json.lineGroups
     } catch (err) {
       console.warn('Could not request color codes', err)
@@ -31,15 +31,15 @@ module.exports = NodeHelper.create({
   },
 
   async socketNotificationReceived(notification, payload) {
-    if (notification == 'SET_CONFIG') {
+    if (notification == 'RNV_CONFIG_REQUEST') {
       const moduleConfig = payload as Config
       // Create apiKey from given credentials
-      if (!moduleConfig.apiKey) {
-        moduleConfig.apiKey = await this.createToken(
-          moduleConfig.oAuthUrl,
-          moduleConfig.clientId,
-          moduleConfig.clientSecret,
-          moduleConfig.resourceId
+      if (!moduleConfig.credentials?.apiKey) {
+        moduleConfig.credentials.apiKey = await this.createToken(
+          moduleConfig.credentials.oAuthUrl,
+          moduleConfig.credentials.clientId,
+          moduleConfig.credentials.clientSecret,
+          moduleConfig.credentials.resourceId
         )
       }
 
@@ -154,9 +154,9 @@ module.exports = NodeHelper.create({
       this.previousFetchOk = true
 
       // Send data to front-end
-      this.sendSocketNotification('DATA', departures)
+      this.sendSocketNotification('RNV_DATA_RESPONSE', departures)
     } catch (err) {
-      console.log('err', err)
+      console.warn('There was a problem with the API request', err)
       // If there is "only" a apiKey given in the configuration,
       // tell the user to update the key (since it is expired).
       const clientID = this.config.clientId
@@ -179,12 +179,11 @@ module.exports = NodeHelper.create({
           // Fetch new data from RNV-Server
           this.getData()
         })
-      } else {
-        // Create error return value
-        const errValue = 1
-        // And send socket notification back to front-end to display the / an error...
-        this.sendSocketNotification('ERROR', errValue)
       }
+      this.sendSocketNotification('RNV_ERROR_RESPONSE', {
+        type: 'WARNING',
+        message: 'Error fetching data.'
+      })
     }
   },
 
@@ -212,8 +211,8 @@ module.exports = NodeHelper.create({
   },
 
   createClient() {
-    const token = this.config.apiKey
-    const httpLink = createHttpLink({ uri: this.config.clientApiUrl, fetch: fetch });
+    const token = this.config.credentials.apiKey
+    const httpLink = createHttpLink({ uri: this.config.clientApiUrl, fetch: fetch })
 
     const middlewareAuthLink = setContext(async (_, { headers }) => {
       return {

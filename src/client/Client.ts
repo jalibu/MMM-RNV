@@ -13,12 +13,7 @@ Module.register<Config>('MMM-RNV', {
     stationId: '2417',
     showLineColors: true,
     maxResults: 10,
-    apiKey: null,
-    clientId: null,
-    resourceId: null,
-    clientSecret: null,
-    oAuthUrl: null,
-    tenantId: null,
+    credentials: null,
     clientApiUrl: 'https://graphql-sandbox-dds.rnv-online.de',
     timeformat: 'HH:mm',
     showPlatform: false,
@@ -31,23 +26,25 @@ Module.register<Config>('MMM-RNV', {
     }
   },
 
-
   // Define start sequence.
   start() {
     Log.info('Starting module: ' + this.name)
     this.hasLoaded = false
-    this.credentials = false
     this._departures = null
+    this._errors = null
+
+    const credentials = this.config.credentials
 
     if (
-      this.config.apiKey ||
-      (this.config.clientId && this.config.clientSecret && this.config.tenantId && this.config.resourceId)
+      credentials?.apiKey ||
+      (credentials?.clientId && credentials?.clientSecret && credentials?.tenantId && credentials?.resourceId)
     ) {
-      this.credentials = true
       // Build oAuthURL based on given tenantID.
-      this.config.oAuthUrl = `https://login.microsoftonline.com/${this.config.tenantId}/oauth2/token`
+      credentials.oAuthUrl = `https://login.microsoftonline.com/${credentials.tenantId}/oauth2/token`
 
-      this.sendSocketNotification('SET_CONFIG', this.config)
+      this.sendSocketNotification('RNV_CONFIG_REQUEST', this.config)
+    } else {
+      this._errors = { type: 'ERROR', message: 'No API credentials provided' }
     }
   },
 
@@ -76,6 +73,7 @@ Module.register<Config>('MMM-RNV', {
     return {
       departures: this._departures,
       config: this.config,
+      errors: this._errors,
       utils,
       moment
     }
@@ -83,15 +81,18 @@ Module.register<Config>('MMM-RNV', {
 
   // Override socket notification handler.
   socketNotificationReceived(notification, payload) {
-    if (notification == 'DATA') {
+    if (notification == 'RNV_DATA_RESPONSE') {
       console.log('Departures', payload)
       this._departures = payload
+      this._errors = null
       this.hasLoaded = true
 
       // Update dom with given animation speed
       this.updateDom(this.hasLoaded ? 0 : this.config.animationSpeedMs)
-    } else if (notification == 'ERROR') {
-      // TODO: Update front-end to display specific error.
+    } else if (notification == 'RNV_ERROR_RESPONSE') {
+      console.log("gut", payload)
+      this._errors = payload
+      this.updateDom(0)
     }
   }
 })

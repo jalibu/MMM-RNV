@@ -28,7 +28,9 @@ Contribution welcome.
 
 3. Request your API Key [here](https://opendata.rnv-online.de/datahub-api).
 
-4. Add the module configuration into the `MagicMirror/config/config.js` file (sample configuration):
+4. [Find the stationId](https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen_mit_haltestellenreferenz.json) of the station that should be displayed.
+
+5. Add the module configuration into the `MagicMirror/config/config.js` file (sample configuration):
 
    ```javascript
     {
@@ -36,41 +38,49 @@ Contribution welcome.
         position: "top_left",
         config: {
             animationSpeedMs: 2 * 1000, // 2 seconds
-            updateIntervalMs: 1 * 60 * 1000, // every 1 minute
-            stationId: '2417',
-            showLineColors: true,
+            credentials: {
+               clientId: "",
+               clientSecret: "",
+               resourceId: "",
+               tenantId: "",
+            }
+            excludeLines: [], // example ["N1", "5"]
+            highlightLines: [], // example ["1"]
             maxResults: 10,
-            clientId: null,
-            resourceId: null,
-            clientSecret: null,
-            tenantId: null,
-            timeformat: 'HH:mm',
+            showLineColors: true,
             showPlatform: false,
             showTableHeadersAsSymbols: false,
-            highlightLines: [], // example ["1"]
-            excludeLines: [], // example ["N1", "5"]
+            stationId: '2417',
+            timeformat: 'HH:mm',
+            updateIntervalMs: 1 * 60 * 1000, // every 1 minute
         }
     }
    ```
 
 ### Options
 
-| Option                      | Description                                                                                                                                                                                                                                                   |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `animationSpeedMs`          | Duration of fade-in animation. <br><br>**Type:** `int` <br> **Default value:** `2000`                                                                                                                                                                         |
-| `updateIntervalMs`          | Determines how often updates should be loaded from server. <br><br>**Type:** `int` <br> **Default value:** `60000`                                                                                                                                            |
-| `stationId`                 | ID of the station that should be displayed.<br>Find your stationId [here](https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen_mit_haltestellenreferenz.json).<br><br>**Type:** `int` <br> **Default value:** `2417` (Mannheim Hbf) |
-| `showLineColors`            | Set to true, to colorize the lines. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                                                                                                |
-| `maxResults`                | Limits number of results. <br><br>**Type:** `int` <br> **Default value:** `10`                                                                                                                                                                                |
-| `clientId`                  | Your clientId. <br><br>**Type:** `string` <br> **Default value:** ``                                                                                                                                                                                          |
-| `resourceId`                | Your resourceId. <br><br>**Type:** `string` <br> **Default value:** ``                                                                                                                                                                                        |
-| `clientSecret`              | Your clientSecret. <br><br>**Type:** `string` <br> **Default value:** ``                                                                                                                                                                                      |
-| `tenantId`                  | Your tenantId. <br><br>**Type:** `string` <br> **Default value:** ``                                                                                                                                                                                          |
-| `timeformat`                | Time format for the departure time. <br><br>**Type:** `string` <br> **Default value:** `HH:mm`                                                                                                                                                                |
-| `showPlatform`              | Set to true, to display platform. <br><br>**Type:** `boolean` <br> **Default value:** `false`                                                                                                                                                                 |
-| `showTableHeadersAsSymbols` | Set to true, to show symbols instead of texts in header. <br><br>**Type:** `boolean` <br> **Default value:** `false`                                                                                                                                          |
-| `highlightLines`            | List of highlighted lines. <br><br>**Type:** `string array` <br> **Default value:** `[]`                                                                                                                                                                      |
-| `excludeLines`              | List of excluded lines. <br><br>**Type:** `string array` <br> **Default value:** `[]`                                                                                                                                                                         |
+| Option                      | Description                                                                                                          |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `animationSpeedMs`          | Duration of fade-in animation. <br><br>**Type:** `int` <br> **Default value:** `2000`                                |
+| `credentials`               | Your RNV API credentials. <br><br>**Type:** `Credentials` <br> **Default value:** `empty object`                     |
+| `excludeLines`              | List of excluded lines. <br><br>**Type:** `string array` <br> **Default value:** `[]`                                |
+| `highlightLines`            | List of highlighted lines. <br><br>**Type:** `string array` <br> **Default value:** `[]`                             |
+| `maxResults`                | Limits number of results. <br><br>**Type:** `int` <br> **Default value:** `10`                                       |
+| `showLineColors`            | Set to true, to colorize the lines. <br><br>**Type:** `boolean` <br> **Default value:** `true`                       |
+| `showPlatform`              | Set to true, to display platform. <br><br>**Type:** `boolean` <br> **Default value:** `false`                        |
+| `showTableHeadersAsSymbols` | Set to true, to show symbols instead of texts in header. <br><br>**Type:** `boolean` <br> **Default value:** `false` |
+| `stationId`                 | ID of the station that should be displayed.<br><br>**Type:** `int` <br> **Default value:** `2417` (Mannheim Hbf)     |
+| `timeformat`                | Time format for the departure time. <br><br>**Type:** `string` <br> **Default value:** `HH:mm`                       |
+| `updateIntervalMs`          | Determines how often updates should be loaded from server. <br><br>**Type:** `int` <br> **Default value:** `60000`   |
+
+### Credentials Object
+
+| Option         | Description                                                              |
+| -------------- | ------------------------------------------------------------------------ |
+| `clientId`     | Your clientId. <br><br>**Type:** `string` <br> **Default value:** ``     |
+| `resourceId`   | Your resourceId. <br><br>**Type:** `string` <br> **Default value:**``    |
+| `clientSecret` | Your clientSecret. <br><br>**Type:** `string` <br> **Default value:** `` |
+| `tenantId`     | Your tenantId. <br><br>**Type:** `string` <br> **Default value:**``      |
 
 ## Contribution and Development
 
@@ -81,3 +91,6 @@ Compile target files with `npm run build`.
 Contribution for this module is welcome!
 
 ## Thanks to
+
+- [jupadin](https://github.com/jupadin)
+- [yawnsde](https://github.com/yawnsde)

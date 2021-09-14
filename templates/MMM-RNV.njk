@@ -1,47 +1,53 @@
-{% if departures.length > 0 %}
-   <div>
-      <table class="light small rnv-schedule">
-      <thead>
-         <tr>
-            <th class="rnv-header departure">
-               {% if config.showTableHeadersAsSymbols %}<i class="far fa-clock"></i>{% else %}{{ "DEPARTURE" | translate | safe }}{% endif %}
-            </th>
-            <th class="rnv-line">
-               {% if config.showTableHeadersAsSymbols %}<i class="fas fa-tag"></i>{% else %}{{ "LINE" | translate | safe }}{% endif %}
-            </th>
-            <th class="rnv-destination">
-               {% if config.showTableHeadersAsSymbols %}<i class="fas fa-arrows-alt-h"></i>{% else %}{{ "DIRECTION" | translate | safe }}{% endif %}
-            </th>
-            {% if config.showPlatform %}
-               <th class="rnv-platform">
-                  {% if config.showTableHeadersAsSymbols %}<i class="fas fa-question"></i>{% else %}{{ "PLATFORM" | translate | safe }}{% endif %}
-               </th>
-            {% endif %}
-         </tr>
-      </thead>
-      <tbody>
-         {% for departure in departures %}
-         <tr class="{% if departure.highlighted %}bright{% endif %}">
-            <td class="rnv-data-time">
-               {{ moment(departure.departure).format(config.timeformat) }}
-               {% if departure.delayInMin !== 0 %}
-                  {% if departure.delayInMin < 0 %}
-                     <span class="small rnv-delay rnv-early">{{ departure.delayInMin }}</span>
-                  {% else %}
-                     <span class="small rnv-delay">+{{ departure.delayInMin }}</span>
-                  {% endif %}
-               {% endif %}
-            </td>
-            <td class="rnv-data-line" style="{{ utils.getLineColorStyle(departure.color) }}"><span class="rnv-data-time-icon"><i class="{{ utils.getTypeIcon(departure.type) }}"></i></span> {{ departure.line }}</td>
-            <td class="rnv-data-destination">{{ departure.destination }}</td>
-            {% if config.showPlatform %}<td class="rnv-data-platform">{{ departure.platform }}</td>{% endif %}
-         </tr>
-         {% endfor %}
-      </tbody>
-      </table>
+{% if errors %}
+   <div class="dimmed light small rnv-error-{{ errors.message }}">
+      {{ errors.message }}
    </div>
- {% else %}
-     <div class="dimmed light small">
-      {{ "LOADING" | translate | safe }}
-    </div>
+{% else %}
+   {% if departures.length > 0 %}
+      <div>
+         <table class="light small rnv-schedule">
+         <thead>
+            <tr>
+               <th class="rnv-header departure">
+                  {% if config.showTableHeadersAsSymbols %}<i class="far fa-clock"></i>{% else %}{{ "DEPARTURE" | translate | safe }}{% endif %}
+               </th>
+               <th class="rnv-line">
+                  {% if config.showTableHeadersAsSymbols %}<i class="fas fa-tag"></i>{% else %}{{ "LINE" | translate | safe }}{% endif %}
+               </th>
+               <th class="rnv-destination">
+                  {% if config.showTableHeadersAsSymbols %}<i class="fas fa-arrows-alt-h"></i>{% else %}{{ "DESTINATION" | translate | safe }}{% endif %}
+               </th>
+               {% if config.showPlatform %}
+                  <th class="rnv-platform">
+                     {% if config.showTableHeadersAsSymbols %}<i class="fas fa-question"></i>{% else %}{{ "PLATFORM" | translate | safe }}{% endif %}
+                  </th>
+               {% endif %}
+            </tr>
+         </thead>
+         <tbody>
+            {% for departure in departures %}
+            <tr class="{% if departure.highlighted %}bright{% endif %}">
+               <td class="rnv-data-time">
+                  {{ moment(departure.departure).format(config.timeformat) }}
+                  {% if departure.delayInMin !== 0 %}
+                     {% if departure.delayInMin < 0 %}
+                        <span class="small rnv-delay rnv-early">{{ departure.delayInMin }}</span>
+                     {% else %}
+                        <span class="small rnv-delay">+{{ departure.delayInMin }}</span>
+                     {% endif %}
+                  {% endif %}
+               </td>
+               <td class="rnv-data-line" style="{{ utils.getLineColorStyle(departure.color) }}"><span class="rnv-data-time-icon"><i class="{{ utils.getTypeIcon(departure.type) }}"></i></span> {{ departure.line }}</td>
+               <td class="rnv-data-destination">{{ departure.destination }}</td>
+               {% if config.showPlatform %}<td class="rnv-data-platform">{{ departure.platform }}</td>{% endif %}
+            </tr>
+            {% endfor %}
+         </tbody>
+         </table>
+      </div>
+   {% else %}
+      <div class="dimmed light small">
+         {{ "LOADING" | translate | safe }}
+      </div>
+   {% endif %}
 {% endif %}

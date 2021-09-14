@@ -1,6 +1,6 @@
 {
   "name": "mmm-rnv",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This module for the MagicMirror² platform monitors a given station in the RNV traffic network.",
   "main": "MMM-RNV.js",
   "scripts": {

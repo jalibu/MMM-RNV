@@ -1,6 +1,6 @@
 {
     "DEPARTURE": "Abfahrt",
     "LINE": "Linie",
-    "DIRECTION": "Richtung",
+    "DESTINATION": "Richtung",
     "PLATFORM": "Gleis"
 }
