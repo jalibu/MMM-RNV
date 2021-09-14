@@ -1,7 +1,7 @@
 {
   "name": "mmm-rnv",
-  "version": "1.0.1",
-  "description": "This module for the MagicMirror² platform monitors a given station in the RNV traffic network.",
+  "version": "1.0.0",
+  "description": "This is a departure monitor for the Rhein-Neckar-Verkehr (RNV) public transport network for the MagicMirror² platform. ",
   "main": "MMM-RNV.js",
   "scripts": {
     "build": "rollup -c",
@@ -13,6 +13,10 @@
     "Jan Litzenburger"
   ],
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jalibu/MMM-RNV/issues"
+  },
+  "homepage": "https://github.com/jalibu/MMM-RNV#readme",
   "dependencies": {
     "apollo-cache-inmemory": "^1.6.6",
     "apollo-client": "^2.6.10",

@@ -11,8 +11,9 @@ const bannerText = `/*! ********************************************************
   Version ${pkg.version}
 
   ${pkg.description}
+  Please submit bugs at ${pkg.bugs.url}
 
-  (c) ${pkg.contributors}
+  (c) ${pkg.author ? pkg.author : pkg.contributors}
   Licence: ${pkg.license}
 
   This file is auto-generated. Do not edit.

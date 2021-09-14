@@ -2,7 +2,7 @@
 
 [![dependencies Status](https://status.david-dm.org/gh/jalibu/MMM-RNV.svg)](https://david-dm.org/jalibu/MMM-RNV) [![Known Vulnerabilities](https://snyk.io/test/github/jalibu/MMM-RNV/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jalibu/MMM-RNV?targetFile=package.json)
 
-This module for the [MagicMirror²](https://magicmirror.builders/) platform monitors a given station in the RNV traffic network.  
+This is a departure monitor for the Rhein-Neckar-Verkehr (RNV) public transport network for the [MagicMirror²](https://magicmirror.builders/) platform.  
 It shows upcoming departures with their destination, type, delay and platform.
 
 Contribution welcome.
