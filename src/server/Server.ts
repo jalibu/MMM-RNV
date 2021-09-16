@@ -5,7 +5,6 @@ import { createHttpLink } from 'apollo-link-http'
 import { setContext } from 'apollo-link-context'
 import gql from 'graphql-tag'
 import fetch from 'node-fetch'
-import { Config } from '../types/Config'
 import { Departure } from '../types/Departure'
 
 module.exports = NodeHelper.create({
@@ -32,18 +31,11 @@ module.exports = NodeHelper.create({
 
   async socketNotificationReceived(notification, payload) {
     if (notification == 'RNV_CONFIG_REQUEST') {
-      const moduleConfig = payload as Config
+      this.config = payload
       // Create apiKey from given credentials
-      if (!moduleConfig.credentials?.apiKey) {
-        moduleConfig.credentials.apiKey = await this.createToken(
-          moduleConfig.credentials.oAuthUrl,
-          moduleConfig.credentials.clientId,
-          moduleConfig.credentials.clientSecret,
-          moduleConfig.credentials.resourceId
-        )
+      if (!this.config.credentials?.apiKey) {
+        await this.createToken()
       }
-
-      this.config = moduleConfig
 
       // Authenticate by OAuth
       if (!this.client) {
@@ -157,68 +149,48 @@ module.exports = NodeHelper.create({
       this.sendSocketNotification('RNV_DATA_RESPONSE', departures)
     } catch (err) {
       console.warn('There was a problem with the API request', err)
-      // If there is "only" a apiKey given in the configuration,
-      // tell the user to update the key (since it is expired).
-      const clientID = this.config.clientId
-      const clientSecret = this.config.clientSecret
-      const resourceID = this.config.resourceId
-      const oAuthURL = this.config.oAuthUrl
-      const previousFetchOk = this.previousFetchOk
 
-      if (clientID && clientSecret && oAuthURL && resourceID && previousFetchOk) {
-        // Reset previousFetchOk, since there was an error (key expired (?))
+      if (this.previousFetchOk) {
         this.previousFetchOk = false
-        // Update apiKey with given credentials
-        this.createToken(oAuthURL, clientID, clientSecret, resourceID).then((key) => {
-          // Renew apiKey
-          this.config.apiKey = key
-
-          // Renew client
-          this.client = this.createClient()
-
-          // Fetch new data from RNV-Server
-          this.getData()
+        await this.createToken()
+        this.client = this.createClient()
+        this.getData()
+      } else {
+        this.sendSocketNotification('RNV_ERROR_RESPONSE', {
+          type: 'WARNING',
+          message: 'Error fetching data.'
         })
       }
-      this.sendSocketNotification('RNV_ERROR_RESPONSE', {
-        type: 'WARNING',
-        message: 'Error fetching data.'
-      })
     }
   },
 
   // Create access token if there is none given in the configuration file
-  async createToken(OAUTH_URL, CLIENT_ID, CLIENT_SECRET, RESOURCE_ID) {
-    const response = await fetch(OAUTH_URL, {
+  async createToken() {
+    const { oAuthUrl, clientId, clientSecret, resourceId } = this.config.credentials
+
+    const response = await fetch(oAuthUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body:
-        'grant_type=client_credentials&client_id=' +
-        CLIENT_ID +
-        '&client_secret=' +
-        CLIENT_SECRET +
-        '&resource=' +
-        RESOURCE_ID
+      body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}&resource=${resourceId}`
     })
 
     if (!response.ok) {
       console.error('Error while creating access token.', response.statusText)
-      return null
     }
-    const json = await response.json()
+    const token = await response.json()
 
-    return json['access_token']
+    this.config.credentials.token = token
   },
 
   createClient() {
-    const token = this.config.credentials.apiKey
+    const token = this.config.credentials.token
     const httpLink = createHttpLink({ uri: this.config.clientApiUrl, fetch: fetch })
 
     const middlewareAuthLink = setContext(async (_, { headers }) => {
       return {
         headers: {
           ...headers,
-          authorization: token ? `Bearer ${token}` : null
+          authorization: token ? `Bearer ${token.access_token}` : null
         }
       }
     })

@@ -34,14 +34,9 @@ Module.register<Config>('MMM-RNV', {
     this._errors = null
 
     const credentials = this.config.credentials
+    credentials.oAuthUrl = `https://login.microsoftonline.com/${credentials.tenantId}/oauth2/token`
 
-    if (
-      credentials?.apiKey ||
-      (credentials?.clientId && credentials?.clientSecret && credentials?.tenantId && credentials?.resourceId)
-    ) {
-      // Build oAuthURL based on given tenantID.
-      credentials.oAuthUrl = `https://login.microsoftonline.com/${credentials.tenantId}/oauth2/token`
-
+    if (credentials?.clientId && credentials?.clientSecret && credentials?.tenantId && credentials?.resourceId) {
       this.sendSocketNotification('RNV_CONFIG_REQUEST', this.config)
     } else {
       this._errors = { type: 'ERROR', message: 'No API credentials provided' }
@@ -90,7 +85,7 @@ Module.register<Config>('MMM-RNV', {
       // Update dom with given animation speed
       this.updateDom(this.hasLoaded ? 0 : this.config.animationSpeedMs)
     } else if (notification == 'RNV_ERROR_RESPONSE') {
-      console.log("gut", payload)
+      console.log('gut', payload)
       this._errors = payload
       this.updateDom(0)
     }

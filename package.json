@@ -1,6 +1,6 @@
 {
   "name": "mmm-rnv",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This is a departure monitor for the Rhein-Neckar-Verkehr (RNV) public transport network for the MagicMirror² platform. ",
   "main": "MMM-RNV.js",
   "scripts": {

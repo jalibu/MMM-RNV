@@ -13,8 +13,7 @@ export default class RNVUtils {
   }
 
   getLineColorStyle(color: Color): string {
-    if(!color || !this.config.showLineColors)
-      return ''
+    if (!color || !this.config.showLineColors) return ''
     return `background: ${color.primary.hex}; color: ${color.contrast.hex}; padding: 5px;`
   }
 }
