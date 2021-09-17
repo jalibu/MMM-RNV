@@ -5,6 +5,7 @@
     "noUnusedLocals": true,
     "noImplicitThis": true,
     "sourceMap": true,
-    "target": "es6"
+    "target": "es6",
+    "lib": ["DOM", "ESNext"]
   }
 }

@@ -13,7 +13,7 @@ module.exports = NodeHelper.create({
     this.client = null
     this.schedule = null
     this.colorCodes = []
-    this.previousFetchOk = false
+    this.failedRequests = 0
     this.getColorCodes()
   },
 
@@ -32,15 +32,6 @@ module.exports = NodeHelper.create({
   async socketNotificationReceived(notification, payload) {
     if (notification == 'RNV_CONFIG_REQUEST') {
       this.config = payload
-      // Create apiKey from given credentials
-      if (!this.config.credentials?.apiKey) {
-        await this.createToken()
-      }
-
-      // Authenticate by OAuth
-      if (!this.client) {
-        this.client = this.createClient()
-      }
 
       // Retrieve data from RNV-Server
       this.getData()
@@ -51,7 +42,22 @@ module.exports = NodeHelper.create({
   },
 
   async getData() {
-    const query = `query {
+    try {
+      // Create client
+      if (!this.client) {
+        try {
+          this.client = await this.createClient()
+        } catch (err) {
+          console.error(`Error generating the client: ${err.message}`)
+          this.sendSocketNotification('RNV_ERROR_RESPONSE', {
+            type: 'WARNING',
+            message: 'Error with API authentication.'
+          })
+
+          return
+        }
+      }
+      const query = `query {
             station(id:"${this.config.stationId}") {
                 hafasID
                 longName
@@ -91,7 +97,6 @@ module.exports = NodeHelper.create({
             }
         }`
 
-    try {
       const departures: Departure[] = []
       const apiResponse = await this.client.query({ query: gql(query) })
 
@@ -117,7 +122,7 @@ module.exports = NodeHelper.create({
           const delayInMs = Math.abs(plannedDepartureDate.getMilliseconds() - realtimeDepartureDate.getMilliseconds())
           delayInMinutes = Math.floor((delayInMs / 60) * 1000)
         } catch (err) {
-          console.warn('There was a problem calculating the delay', err)
+          console.warn(`Error calculating the delay: ${err.message}`)
         }
 
         const line = apiDeparture.line.id.split('-')[1]
@@ -142,20 +147,18 @@ module.exports = NodeHelper.create({
         }
       }
 
-      // Set flag to check whether a previous fetch was successful
-      this.previousFetchOk = true
+      this.failedRequests = 0
 
       // Send data to front-end
       this.sendSocketNotification('RNV_DATA_RESPONSE', departures)
     } catch (err) {
-      console.warn('There was a problem with the API request', err)
+      console.warn(`Error fetching the data from the API: ${err.message}`)
+      this.failedRequests++
 
-      if (this.previousFetchOk) {
-        this.previousFetchOk = false
-        await this.createToken()
-        this.client = this.createClient()
-        this.getData()
-      } else {
+      if (this.failedRequests > 5) {
+        this.client = null
+        console.log('Reset the RNV API client')
+
         this.sendSocketNotification('RNV_ERROR_RESPONSE', {
           type: 'WARNING',
           message: 'Error fetching data.'
@@ -164,33 +167,29 @@ module.exports = NodeHelper.create({
     }
   },
 
-  // Create access token if there is none given in the configuration file
-  async createToken() {
-    const { oAuthUrl, clientId, clientSecret, resourceId } = this.config.credentials
+  async createClient() {
+    // Create Access Token
+    const { clientId, clientSecret, resourceId, tenantId } = this.config.credentials
 
-    const response = await fetch(oAuthUrl, {
+    const response = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}&resource=${resourceId}`
     })
 
     if (!response.ok) {
-      console.error('Error while creating access token.', response.statusText)
+      throw Error(`Could not fetch the access token (${response.status} ${response.statusText})`)
     }
-    const token = await response.json()
+    const { access_token } = await response.json()
+    console.log('Created new RNV API access token')
 
-    this.config.credentials.token = token
-  },
-
-  createClient() {
-    const token = this.config.credentials.token
     const httpLink = createHttpLink({ uri: this.config.clientApiUrl, fetch: fetch })
 
     const middlewareAuthLink = setContext(async (_, { headers }) => {
       return {
         headers: {
           ...headers,
-          authorization: token ? `Bearer ${token.access_token}` : null
+          authorization: access_token ? `Bearer ${access_token}` : null
         }
       }
     })

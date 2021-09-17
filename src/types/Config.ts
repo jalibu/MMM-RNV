@@ -2,9 +2,6 @@ export type Config = {
   animationSpeedMs: number
   clientApiUrl: string
   credentials: {
-    token?: {
-      access_token: string
-    }
     clientId: string
     clientSecret: string
     oAuthUrl?: string

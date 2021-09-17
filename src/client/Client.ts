@@ -34,9 +34,8 @@ Module.register<Config>('MMM-RNV', {
     this._errors = null
 
     const credentials = this.config.credentials
-    
+
     if (credentials?.clientId && credentials?.clientSecret && credentials?.tenantId && credentials?.resourceId) {
-      credentials.oAuthUrl = `https://login.microsoftonline.com/${credentials.tenantId}/oauth2/token`
       this.sendSocketNotification('RNV_CONFIG_REQUEST', this.config)
     } else {
       this._errors = { type: 'ERROR', message: 'No API credentials provided' }
