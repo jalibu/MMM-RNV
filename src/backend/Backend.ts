@@ -30,7 +30,7 @@ module.exports = NodeHelper.create({
   },
 
   async socketNotificationReceived(notification, payload) {
-    if (notification == 'RNV_CONFIG_REQUEST') {
+    if (notification === 'RNV_CONFIG_REQUEST') {
       this.config = payload
 
       // Retrieve data from RNV-Server
@@ -107,8 +107,10 @@ module.exports = NodeHelper.create({
 
       // Sorting fetched data based on the departure times
       apiDepartures.sort((a, b) => {
-        let depA = a.stops[0].plannedDeparture.isoString
-        let depB = b.stops[0].plannedDeparture.isoString
+        const depA = a.stops[0].plannedDeparture.isoString
+        const depB = b.stops[0].plannedDeparture.isoString
+
+        /* eslint-disable-next-line no-nested-ternary */
         return depA < depB ? -1 : depA > depB ? 1 : 0
       })
 
@@ -153,7 +155,7 @@ module.exports = NodeHelper.create({
       this.sendSocketNotification('RNV_DATA_RESPONSE', departures)
     } catch (err) {
       console.warn(`Error fetching the data from the API: ${err.message}`)
-      this.failedRequests++
+      this.failedRequests += 1
 
       if (this.failedRequests > 5) {
         this.client = null
@@ -180,15 +182,17 @@ module.exports = NodeHelper.create({
     if (!response.ok) {
       throw Error(`Could not fetch the access token (${response.status} ${response.statusText})`)
     }
+    /* eslint-disable-next-line camelcase */
     const { access_token } = await response.json()
     console.log('Created new RNV API access token')
 
-    const httpLink = createHttpLink({ uri: this.config.clientApiUrl, fetch: fetch })
+    const httpLink = createHttpLink({ uri: this.config.clientApiUrl, fetch })
 
     const middlewareAuthLink = setContext(async (_, { headers }) => {
       return {
         headers: {
           ...headers,
+          /* eslint-disable-next-line camelcase */
           authorization: access_token ? `Bearer ${access_token}` : null
         }
       }
