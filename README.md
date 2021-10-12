@@ -1,6 +1,6 @@
 # MMM-RNV
 
-[![version](https://img.shields.io/github/package-json/v/jalibu/MMM-RNV)](https://github.com/jalibu/MMM-RNV/releases) [![dependencies Status](https://status.david-dm.org/gh/jalibu/MMM-RNV.svg)](https://david-dm.org/jalibu/MMM-RNV) [![Known Vulnerabilities](https://snyk.io/test/github/jalibu/MMM-RNV/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jalibu/MMM-RNV?targetFile=package.json)
+[![version](https://img.shields.io/github/package-json/v/jalibu/MMM-RNV)](https://github.com/jalibu/MMM-RNV/releases) [![Known Vulnerabilities](https://snyk.io/test/github/jalibu/MMM-RNV/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jalibu/MMM-RNV?targetFile=package.json)
 
 This is a departure monitor for the Rhein-Neckar-Verkehr (RNV) public transport network for the [MagicMirror²](https://magicmirror.builders/) platform.  
 It shows upcoming departures with their destination, type, delay and platform.
