@@ -45,6 +45,7 @@ Contribution welcome.
                tenantId: "",
             },
             excludeLines: [], // example ["N1", "5"]
+            excludePlatforms: [], // example ["A"]
             highlightLines: [], // example ["1"]
             maxResults: 10,
             showLineColors: true,
@@ -53,25 +54,28 @@ Contribution welcome.
             stationId: '2417',
             timeformat: 'HH:mm',
             updateIntervalMs: 1 * 60 * 1000, // every 1 minute
+            walkingTimeMs: 3 * 60 * 1000 // 3 minutes footwalk
         }
     }
    ```
 
 ### Options
 
-| Option                      | Description                                                                                                          |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `animationSpeedMs`          | Duration of fade-in animation. <br><br>**Type:** `int` <br> **Default value:** `2000`                                |
-| `credentials`               | Your RNV API credentials. <br><br>**Type:** `Credentials` <br> **Default value:** `empty object`                     |
-| `excludeLines`              | List of excluded lines. <br><br>**Type:** `string array` <br> **Default value:** `[]`                                |
-| `highlightLines`            | List of highlighted lines. <br><br>**Type:** `string array` <br> **Default value:** `[]`                             |
-| `maxResults`                | Limits number of results. <br><br>**Type:** `int` <br> **Default value:** `10`                                       |
-| `showLineColors`            | Set to true, to colorize the lines. <br><br>**Type:** `boolean` <br> **Default value:** `true`                       |
-| `showPlatform`              | Set to true, to display platform. <br><br>**Type:** `boolean` <br> **Default value:** `false`                        |
-| `showTableHeadersAsSymbols` | Set to true, to show symbols instead of texts in header. <br><br>**Type:** `boolean` <br> **Default value:** `false` |
-| `stationId`                 | ID of the station that should be displayed.<br><br>**Type:** `int` <br> **Default value:** `2417` (Mannheim Hbf)     |
-| `timeformat`                | Time format for the departure time. <br><br>**Type:** `string` <br> **Default value:** `HH:mm`                       |
-| `updateIntervalMs`          | Determines how often updates should be loaded from server. <br><br>**Type:** `int` <br> **Default value:** `60000`   |
+| Option                      | Description                                                                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `animationSpeedMs`          | Duration of fade-in animation. <br><br>**Type:** `int` <br> **Default value:** `2000`                                                             |
+| `credentials`               | Your RNV API credentials. <br><br>**Type:** `Credentials` <br> **Default value:** `empty object`                                                  |
+| `excludeLines`              | List of excluded lines. <br><br>**Type:** `string array` <br> **Default value:** `[]`                                                             |
+| `excludePlatforms`          | List of excluded platforms, e.g. if you only want to see one direction. <br><br>**Type:** `string array` <br> **Default value:** `[]`             |
+| `highlightLines`            | List of highlighted lines. <br><br>**Type:** `string array` <br> **Default value:** `[]`                                                          |
+| `maxResults`                | Limits number of results. <br><br>**Type:** `int` <br> **Default value:** `10`                                                                    |
+| `showLineColors`            | Set to true, to colorize the lines. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                    |
+| `showPlatform`              | Set to true, to display platform. <br><br>**Type:** `boolean` <br> **Default value:** `false`                                                     |
+| `showTableHeadersAsSymbols` | Set to true, to show symbols instead of texts in header. <br><br>**Type:** `boolean` <br> **Default value:** `false`                              |
+| `stationId`                 | ID of the station that should be displayed.<br><br>**Type:** `int` <br> **Default value:** `2417` (Mannheim Hbf)                                  |
+| `timeformat`                | Time format for the departure time. <br><br>**Type:** `string` <br> **Default value:** `HH:mm`                                                    |
+| `updateIntervalMs`          | Determines how often updates should be loaded from server. <br><br>**Type:** `int` <br> **Default value:** `60000` (every 1 minute)               |
+| `walkingTimeMs`             | Filter for departures that are reachable considering the walking time.<br><br>**Type:** `int` <br> **Default value:** `3 * 60 * 1000` (3 minutes) |
 
 ### Credentials Object
 

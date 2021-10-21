@@ -10,6 +10,7 @@ Module.register<Config>('MMM-RNV', {
   defaults: {
     animationSpeedMs: 2 * 1000, // 2 seconds
     updateIntervalMs: 1 * 60 * 1000, // every 1 minute
+    walkingTimeMs: 3 * 60 * 1000,
     stationId: '2417',
     showLineColors: true,
     maxResults: 10,
@@ -20,6 +21,7 @@ Module.register<Config>('MMM-RNV', {
     showTableHeadersAsSymbols: false,
     highlightLines: [],
     excludeLines: [],
+    excludePlatforms: [],
     icons: {
       STRASSENBAHN: 'fas fa-train',
       STADTBUS: 'fas fa-bus'
@@ -28,17 +30,17 @@ Module.register<Config>('MMM-RNV', {
 
   // Define start sequence.
   start() {
-    Log.info('Starting module: ' + this.name)
+    Log.info(`Starting module: ${this.name}`)
     this.hasLoaded = false
-    this._departures = null
-    this._errors = null
+    this.departures = null
+    this.errors = null
 
-    const credentials = this.config.credentials
+    const { credentials } = this.config
 
     if (credentials?.clientId && credentials?.clientSecret && credentials?.tenantId && credentials?.resourceId) {
       this.sendSocketNotification('RNV_CONFIG_REQUEST', this.config)
     } else {
-      this._errors = { type: 'ERROR', message: 'No API credentials provided' }
+      this.errors = { type: 'ERROR', message: 'No API credentials provided' }
     }
   },
 
@@ -64,10 +66,11 @@ Module.register<Config>('MMM-RNV', {
 
   getTemplateData() {
     const utils = new Utils(this.config)
+
     return {
-      departures: this._departures,
+      departures: this.departures,
       config: this.config,
-      errors: this._errors,
+      errors: this.errors,
       utils,
       moment
     }
@@ -75,17 +78,17 @@ Module.register<Config>('MMM-RNV', {
 
   // Override socket notification handler.
   socketNotificationReceived(notification, payload) {
-    if (notification == 'RNV_DATA_RESPONSE') {
-      console.log('Departures', payload)
-      this._departures = payload
-      this._errors = null
+    if (notification === 'RNV_DATA_RESPONSE') {
+      Log.log('Departures', payload)
+      this.departures = payload
+      this.errors = null
       this.hasLoaded = true
 
       // Update dom with given animation speed
       this.updateDom(this.hasLoaded ? 0 : this.config.animationSpeedMs)
-    } else if (notification == 'RNV_ERROR_RESPONSE') {
-      console.log('gut', payload)
-      this._errors = payload
+    } else if (notification === 'RNV_ERROR_RESPONSE') {
+      Log.warn(payload)
+      this.errors = payload
       this.updateDom(0)
     }
   }

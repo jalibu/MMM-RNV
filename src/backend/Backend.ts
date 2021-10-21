@@ -5,6 +5,7 @@ import { createHttpLink } from 'apollo-link-http'
 import { setContext } from 'apollo-link-context'
 import gql from 'graphql-tag'
 import fetch from 'node-fetch'
+import * as Log from 'logger'
 import { Departure } from '../types/Departure'
 
 module.exports = NodeHelper.create({
@@ -25,7 +26,7 @@ module.exports = NodeHelper.create({
       const json = (await results.json()) as any
       this.colorCodes = json.lineGroups
     } catch (err) {
-      console.warn('Could not request color codes', err)
+      Log.warn('Could not request color codes', err)
     }
   },
 
@@ -48,7 +49,7 @@ module.exports = NodeHelper.create({
         try {
           this.client = await this.createClient()
         } catch (err) {
-          console.error(`Error generating the client: ${err.message}`)
+          Log.error(`Error generating the client: ${err.message}`)
           this.sendSocketNotification('RNV_ERROR_RESPONSE', {
             type: 'WARNING',
             message: 'Error with API authentication.'
@@ -57,11 +58,12 @@ module.exports = NodeHelper.create({
           return
         }
       }
+      const journeyStart = new Date(Date.now() + this.config.walkingTimeMs)
       const query = `query {
             station(id:"${this.config.stationId}") {
                 hafasID
                 longName
-                journeys(startTime: "${new Date().toISOString()}" first: 50) {
+                journeys(startTime: "${journeyStart.toISOString()}" first: 50) {
                     totalCount
                     elements {
                         ... on Journey {
@@ -124,11 +126,14 @@ module.exports = NodeHelper.create({
           const delayInMs = Math.abs(plannedDepartureDate.getMilliseconds() - realtimeDepartureDate.getMilliseconds())
           delayInMinutes = Math.floor((delayInMs / 60) * 1000)
         } catch (err) {
-          console.warn(`Error calculating the delay: ${err.message}`)
+          Log.warn(`Error calculating the delay: ${err.message}`)
         }
 
         const line = apiDeparture.line.id.split('-')[1]
-        if (this.config.excludeLines.includes(line)) {
+        if (
+          this.config.excludeLines.includes(line) ||
+          this.config.excludePlatforms.includes(apiDeparture.stops[0].pole.platform.label)
+        ) {
           continue
         }
 
@@ -154,12 +159,12 @@ module.exports = NodeHelper.create({
       // Send data to front-end
       this.sendSocketNotification('RNV_DATA_RESPONSE', departures)
     } catch (err) {
-      console.warn(`Error fetching the data from the API: ${err.message}`)
+      Log.warn(`Error fetching the data from the API: ${err.message}`)
       this.failedRequests += 1
 
       if (this.failedRequests > 5) {
         this.client = null
-        console.log('Reset the RNV API client')
+        Log.log('Reset the RNV API client')
 
         this.sendSocketNotification('RNV_ERROR_RESPONSE', {
           type: 'WARNING',
@@ -184,7 +189,7 @@ module.exports = NodeHelper.create({
     }
     /* eslint-disable-next-line camelcase */
     const { access_token } = await response.json()
-    console.log('Created new RNV API access token')
+    Log.log('Created new RNV API access token')
 
     const httpLink = createHttpLink({ uri: this.config.clientApiUrl, fetch })
 

@@ -9,6 +9,7 @@ export type Config = {
     tenantId: string
   }
   excludeLines: string[]
+  excludePlatforms: string[]
   highlightLines: string[]
   icons: {
     STRASSENBAHN: string
@@ -21,4 +22,5 @@ export type Config = {
   showTableHeadersAsSymbols: boolean
   timeformat: string
   updateIntervalMs: number
+  walkingTimeMs: number
 }
