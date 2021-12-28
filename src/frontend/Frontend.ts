@@ -38,10 +38,17 @@ Module.register<Config>('MMM-RNV', {
     const { credentials } = this.config
 
     if (credentials?.clientId && credentials?.clientSecret && credentials?.tenantId && credentials?.resourceId) {
-      this.sendSocketNotification('RNV_CONFIG_REQUEST', this.config)
+      this.getData()
+      setInterval(() => {
+        this.getData()
+      }, this.config.updateIntervalMs)
     } else {
       this.errors = { type: 'ERROR', message: 'No API credentials provided' }
     }
+  },
+
+  getData() {
+    this.sendSocketNotification('RNV_DEPARTURE_REQUEST', this.config)
   },
 
   // Define required styles.
@@ -78,7 +85,7 @@ Module.register<Config>('MMM-RNV', {
 
   // Override socket notification handler.
   socketNotificationReceived(notification, payload) {
-    if (notification === 'RNV_DATA_RESPONSE') {
+    if (notification === `RNV_DATA_RESPONSE_${this.config.stationId}`) {
       Log.log('Departures', payload)
       this.departures = payload
       this.errors = null

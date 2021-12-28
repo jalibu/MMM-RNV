@@ -7,12 +7,12 @@ import gql from 'graphql-tag'
 import fetch from 'node-fetch'
 import * as Log from 'logger'
 import { Departure } from '../types/Departure'
+import { Config } from '../types/Config'
 
 module.exports = NodeHelper.create({
   start() {
-    this.config = null
     this.client = null
-    this.schedule = null
+    this.schedule = []
     this.colorCodes = []
     this.failedRequests = 0
     this.getColorCodes()
@@ -31,23 +31,19 @@ module.exports = NodeHelper.create({
   },
 
   async socketNotificationReceived(notification, payload) {
-    if (notification === 'RNV_CONFIG_REQUEST') {
-      this.config = payload
-
+    if (notification === 'RNV_DEPARTURE_REQUEST') {
+      const config = payload
       // Retrieve data from RNV-Server
-      this.getData()
-      if (!this.schedule) {
-        this.schedule = setInterval(this.getData.bind(this), this.config.updateIntervalMs)
-      }
+      this.getData(config)
     }
   },
 
-  async getData() {
+  async getData(config: Config) {
     try {
       // Create client
       if (!this.client) {
         try {
-          this.client = await this.createClient()
+          this.client = await this.createClient(config)
         } catch (err) {
           Log.error(`Error generating the client: ${err.message}`)
           this.sendSocketNotification('RNV_ERROR_RESPONSE', {
@@ -58,9 +54,11 @@ module.exports = NodeHelper.create({
           return
         }
       }
-      const journeyStart = new Date(Date.now() + this.config.walkingTimeMs)
+      const journeyStart = new Date(Date.now() + config.walkingTimeMs)
+
+      Log.info(`Request departures for station '${config.stationId}'`)
       const query = `query {
-            station(id:"${this.config.stationId}") {
+            station(id:"${config.stationId}") {
                 hafasID
                 longName
                 journeys(startTime: "${journeyStart.toISOString()}" first: 50) {
@@ -71,7 +69,7 @@ module.exports = NodeHelper.create({
                                 id
                             }
                             type
-                            stops(onlyHafasID: "${this.config.stationId}") {
+                            stops(onlyHafasID: "${config.stationId}") {
                                 pole {
                                     platform {
                                         type
@@ -131,8 +129,8 @@ module.exports = NodeHelper.create({
 
         const line = apiDeparture.line.id.split('-')[1]
         if (
-          this.config.excludeLines.includes(line) ||
-          this.config.excludePlatforms.includes(apiDeparture.stops[0].pole.platform.label)
+          config.excludeLines.includes(line) ||
+          config.excludePlatforms.includes(apiDeparture.stops[0].pole.platform.label)
         ) {
           continue
         }
@@ -144,12 +142,12 @@ module.exports = NodeHelper.create({
           delayInMin: delayInMinutes,
           platform: apiDeparture.stops[0].pole.platform.label,
           type: apiDeparture.type,
-          highlighted: this.config.highlightLines.includes(line),
+          highlighted: config.highlightLines.includes(line),
           color: this.colorCodes.find((code) => code.id === line)
         }
 
         departures.push(departure)
-        if (departures.length === this.config.maxResults) {
+        if (departures.length === config.maxResults) {
           break
         }
       }
@@ -157,7 +155,7 @@ module.exports = NodeHelper.create({
       this.failedRequests = 0
 
       // Send data to front-end
-      this.sendSocketNotification('RNV_DATA_RESPONSE', departures)
+      this.sendSocketNotification(`RNV_DATA_RESPONSE_${config.stationId}`, departures)
     } catch (err) {
       Log.warn(`Error fetching the data from the API: ${err.message}`)
       this.failedRequests += 1
@@ -174,9 +172,9 @@ module.exports = NodeHelper.create({
     }
   },
 
-  async createClient() {
+  async createClient(config: Config) {
     // Create Access Token
-    const { clientId, clientSecret, resourceId, tenantId } = this.config.credentials
+    const { clientId, clientSecret, resourceId, tenantId } = config.credentials
 
     const response = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/token`, {
       method: 'POST',
@@ -191,7 +189,7 @@ module.exports = NodeHelper.create({
     const { access_token } = await response.json()
     Log.log('Created new RNV API access token')
 
-    const httpLink = createHttpLink({ uri: this.config.clientApiUrl, fetch })
+    const httpLink = createHttpLink({ uri: config.clientApiUrl, fetch })
 
     const middlewareAuthLink = setContext(async (_, { headers }) => {
       return {
