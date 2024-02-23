@@ -8,6 +8,11 @@
     "dev": "rollup -c --sourcemap=inline",
     "dev:watch": "npm run dev -- --watch"
   },
+  "keywords": [
+    "MagicMirror",
+    "Public Transport",
+    "RNV"
+  ],
   "contributors": [
     "Julian Dinter",
     "Jan Litzenburger"
