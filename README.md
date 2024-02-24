@@ -7,9 +7,9 @@ It shows upcoming departures with their destination, type, delay and platform.
 
 Contribution welcome.
 
-### Demo
+## Demo
 
-![image](https://user-images.githubusercontent.com/25933231/133120000-fa4ea8d3-5cc4-43c6-b23c-216a9d890988.png)
+![screenshot](screenshot.png)
 
 ## Installing the Module
 
@@ -59,7 +59,7 @@ Contribution welcome.
     }
    ```
 
-### Options
+## Options
 
 | Option                      | Description                                                                                                                                       |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -77,7 +77,7 @@ Contribution welcome.
 | `updateIntervalMs`          | Determines how often updates should be loaded from server. <br><br>**Type:** `int` <br> **Default value:** `60000` (every 1 minute)               |
 | `walkingTimeMs`             | Filter for departures that are reachable considering the walking time.<br><br>**Type:** `int` <br> **Default value:** `3 * 60 * 1000` (3 minutes) |
 
-### Credentials Object
+## Credentials Object
 
 | Option         | Description                                                              |
 | -------------- | ------------------------------------------------------------------------ |
