@@ -25,30 +25,30 @@ Contribution welcome.
 
 4. Add the module configuration into the `config.js` file (sample configuration):
    ```javascript
-       {
-         module: "MMM-RNV",
-         position: "top_left",
-         config: {
-           animationSpeedMs: 2 * 1000, // 2 seconds
-           credentials: {
-             clientId: "",
-             clientSecret: "",
-             resourceId: "",
-             tenantId: "",
-           },
-           excludeLines: [], // example ["N1", "5"]
-           excludePlatforms: [], // example ["A"]
-           highlightLines: [], // example ["1"]
-           maxResults: 10,
-           showLineColors: true,
-           showPlatform: false,
-           showTableHeadersAsSymbols: false,
-           stationId: '2417',
-           timeformat: 'HH:mm',
-           updateIntervalMs: 1 * 60 * 1000, // every 1 minute
-           walkingTimeMs: 3 * 60 * 1000 // 3 minutes footwalk
-         }
+   {
+     module: 'MMM-RNV',
+     position: 'top_left',
+     config: {
+       animationSpeedMs: 2 * 1000, // 2 seconds
+       credentials: {
+         clientId: '',
+         clientSecret: '',
+         resourceId: '',
+         tenantId: ''
        },
+       excludeLines: [], // example ["N1", "5"]
+       excludePlatforms: [], // example ["A"]
+       highlightLines: [], // example ["1"]
+       maxResults: 10,
+       showLineColors: true,
+       showPlatform: false,
+       showTableHeadersAsSymbols: false,
+       stationId: '2417',
+       timeformat: 'HH:mm',
+       updateIntervalMs: 1 * 60 * 1000, // every 1 minute
+       walkingTimeMs: 3 * 60 * 1000 // 3 minutes footwalk
+     }
+   },
    ```
 
 ## Options
@@ -94,6 +94,46 @@ The source files are located in the `/src` directory.
 Compile target files with `node --run build`.
 
 Contribution for this module is welcome!
+
+### Available Scripts
+
+| Script                  | Purpose                                                   |
+| ----------------------- | --------------------------------------------------------- |
+| `node --run build`      | Production build (minified, optimized)                    |
+| `node --run dev`        | Development build with inline sourcemaps                  |
+| `node --run dev:watch`  | Watch mode for active development                         |
+| `node --run test`       | Full quality check (TypeScript + ESLint + Prettier)       |
+| `node --run type-check` | TypeScript type validation only                           |
+| `node --run lint`       | Check code style (ESLint + Prettier)                      |
+| `node --run lint:fix`   | Auto-fix code style issues                                |
+| `node --run release`    | Create release (bumps version, rebuilds, creates git tag) |
+
+### Development Workflow
+
+```bash
+# Start development with watch mode
+node --run dev:watch
+
+# Before committing, run full quality check
+node --run test
+
+# Auto-fix any linting/formatting issues
+node --run lint:fix
+
+# When ready for release
+node --run release
+```
+
+### Git Hooks
+
+Following Git hooks are automatically activated (via simple-git-hooks):
+
+- **pre-commit**: runs `npm run test`
+- **pre-push**: runs `npm run build`
+
+### Release
+
+Releases are handled with `node --run release` (commit-and-tag-version). The script bumps the version, creates a git tag, rebuilds the bundled files (MMM-RNV.js, node_helper.js), and stages them via the configured postbump step.
 
 ## Thanks to
 

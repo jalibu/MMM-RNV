@@ -12,7 +12,11 @@
     "dev": "rollup -c --sourcemap=inline",
     "dev:watch": "node --run dev -- --watch",
     "lint": "eslint && prettier --check .",
-    "lint:fix": "eslint --fix && prettier . --write"
+    "lint:fix": "eslint --fix && prettier . --write",
+    "prepare": "simple-git-hooks",
+    "release": "commit-and-tag-version",
+    "test": "npm run type-check && npm run lint",
+    "type-check": "tsc --noEmit"
   },
   "keywords": [
     "MagicMirror",
@@ -28,6 +32,15 @@
     "url": "https://github.com/jalibu/MMM-RNV/issues"
   },
   "homepage": "https://github.com/jalibu/MMM-RNV#readme",
+  "simple-git-hooks": {
+    "pre-commit": "npm run test",
+    "pre-push": "npm run build"
+  },
+  "commit-and-tag-version": {
+    "scripts": {
+      "postbump": "npm run build && git add MMM-RNV.js node_helper.js"
+    }
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-json": "^6.1.0",
@@ -40,6 +53,8 @@
     "prettier": "^3.7.4",
     "rollup": "^4.53.5",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.0"
+    "typescript-eslint": "^8.50.0",
+    "commit-and-tag-version": "^12.6.1",
+    "simple-git-hooks": "^2.13.1"
   }
 }

@@ -47,10 +47,7 @@ export default [
   },
   {
     input: './src/backend/Backend.ts',
-    external: [
-      'logger',
-      'node_helper'
-    ],
+    external: ['logger', 'node_helper'],
     plugins: [
       json(),
       typescript({ tsconfig: './tsconfig.json', module: 'ESNext' }),

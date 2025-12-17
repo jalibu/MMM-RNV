@@ -21,7 +21,6 @@ interface ColorCode {
   [key: string]: unknown
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 module.exports = NodeHelper.create({
   start() {
     this.accessToken = null
@@ -216,7 +215,11 @@ module.exports = NodeHelper.create({
     return access_token
   },
 
-  async fetchGraphql(uri: string, query: string, token: string): Promise<{
+  async fetchGraphql(
+    uri: string,
+    query: string,
+    token: string
+  ): Promise<{
     data: { station: { journeys: { elements: ApiDeparture[] } } }
   }> {
     const response = await fetch(uri, {
@@ -234,7 +237,7 @@ module.exports = NodeHelper.create({
 
     const body = (await response.json()) as {
       data: { station: { journeys: { elements: ApiDeparture[] } } }
-      errors?: Array<{ message: string }>
+      errors?: { message: string }[]
     }
     if (body.errors?.length) {
       throw Error(body.errors.map((e) => e.message).join('; '))
