@@ -39,7 +39,11 @@
   "commit-and-tag-version": {
     "scripts": {
       "postbump": "npm run build && git add MMM-RNV.js node_helper.js"
-    }
+    },
+    "skip": {
+      "commit": false
+    },
+    "commitAll": true
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
