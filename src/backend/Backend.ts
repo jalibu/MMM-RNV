@@ -1,9 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const module: any
 import * as NodeHelper from 'node_helper'
-import { ApolloClient } from 'apollo-client'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import { createHttpLink } from 'apollo-link-http'
-import { setContext } from 'apollo-link-context'
-import gql from 'graphql-tag'
 import * as Log from 'logger'
 import { Departure } from '../types/Departure'
 import { Config } from '../types/Config'
@@ -24,9 +21,10 @@ interface ColorCode {
   [key: string]: unknown
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 module.exports = NodeHelper.create({
   start() {
-    this.client = null
+    this.accessToken = null
     this.schedule = []
     this.colorCodes = []
     this.failedRequests = 0
@@ -57,9 +55,9 @@ module.exports = NodeHelper.create({
   async getData(config: Config) {
     try {
       // Create client
-      if (!this.client) {
+      if (!this.accessToken) {
         try {
-          this.client = await this.createClient(config)
+          this.accessToken = await this.createAccessToken(config)
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err)
           ;(Log.error ?? Log.warn)(`Error generating the client: ${message}`)
@@ -115,11 +113,11 @@ module.exports = NodeHelper.create({
         }`
 
       const departures: Departure[] = []
-      const apiResponse = await this.client.query({ query: gql(query) })
+      const apiResponse = await this.fetchGraphql(config.clientApiUrl, query, this.accessToken)
 
       // Remove elements where depature time is not set
-      const apiDepartures = (apiResponse.data.station.journeys.elements as ApiDeparture[]).filter(
-        (journey) => journey.stops[0].plannedDeparture.isoString !== null
+      const apiDepartures = apiResponse.data.station.journeys.elements.filter(
+        (journey: ApiDeparture) => journey.stops[0].plannedDeparture.isoString !== null
       )
 
       // Sorting fetched data based on the departure times
@@ -189,8 +187,8 @@ module.exports = NodeHelper.create({
       this.failedRequests += 1
 
       if (this.failedRequests > 5) {
-        this.client = null
-        Log.log('Reset the RNV API client')
+        this.accessToken = null
+        Log.log('Reset the RNV API access token')
 
         this.sendSocketNotification('RNV_ERROR_RESPONSE', {
           type: 'WARNING',
@@ -200,8 +198,7 @@ module.exports = NodeHelper.create({
     }
   },
 
-  async createClient(config: Config) {
-    // Create Access Token
+  async createAccessToken(config: Config): Promise<string> {
     const { clientId, clientSecret, resourceId, tenantId } = config.credentials
 
     const response = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/token`, {
@@ -214,24 +211,34 @@ module.exports = NodeHelper.create({
       throw Error(`Could not fetch the access token (${response.status} ${response.statusText})`)
     }
 
-    const { access_token } = await response.json()
+    const { access_token } = (await response.json()) as { access_token: string }
     Log.log('Created new RNV API access token')
+    return access_token
+  },
 
-    const httpLink = createHttpLink({ uri: config.clientApiUrl, fetch })
-
-    const middlewareAuthLink = setContext(async (_, { headers }) => {
-      return {
-        headers: {
-          ...headers,
-
-          authorization: access_token ? `Bearer ${access_token}` : null
-        }
-      }
+  async fetchGraphql(uri: string, query: string, token: string): Promise<{
+    data: { station: { journeys: { elements: ApiDeparture[] } } }
+  }> {
+    const response = await fetch(uri, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: token ? `Bearer ${token}` : ''
+      },
+      body: JSON.stringify({ query })
     })
 
-    return new ApolloClient({
-      link: middlewareAuthLink.concat(httpLink),
-      cache: new InMemoryCache()
-    })
+    if (!response.ok) {
+      throw Error(`GraphQL request failed (${response.status} ${response.statusText})`)
+    }
+
+    const body = (await response.json()) as {
+      data: { station: { journeys: { elements: ApiDeparture[] } } }
+      errors?: Array<{ message: string }>
+    }
+    if (body.errors?.length) {
+      throw Error(body.errors.map((e) => e.message).join('; '))
+    }
+    return body
   }
 })

@@ -19,19 +19,11 @@ Contribution welcome.
    git clone https://github.com/jalibu/MMM-RNV
    ```
 
-2. Change into the MMM-RNV module folder and install runtime dependencies with
+2. Request your API Key here: [Data Hub API](https://www.opendata-oepnv.de/ht/de/organisation/verkehrsunternehmen/rnv/openrnv/api). Select **GraphQL** (not GTFS) in the form.
 
-   ```sh
-   cd MMM-RNV
-   npm install --only=production
-   ```
+3. [Find the stationId](https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen_mit_haltestellenreferenz.json) of the station that should be displayed.
 
-3. Request your API Key here: [Data Hub API](https://www.opendata-oepnv.de/ht/de/organisation/verkehrsunternehmen/rnv/openrnv/api). Select **GraphQL** (not GTFS) in the form.
-
-4. [Find the stationId](https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen_mit_haltestellenreferenz.json) of the station that should be displayed.
-
-5. Add the module configuration into the `config.js` file (sample configuration):
-
+4. Add the module configuration into the `config.js` file (sample configuration):
    ```javascript
        {
          module: "MMM-RNV",
@@ -86,11 +78,20 @@ Contribution welcome.
 | `clientSecret` | Your clientSecret. <br><br>**Type:** `string` <br> **Default value:** `` |
 | `tenantId`     | Your tenantId. <br><br>**Type:** `string` <br> **Default value:**``      |
 
+## Update
+
+To update the module, navigate to the module directory and pull the latest changes:
+
+```sh
+cd ~/MagicMirror/modules/MMM-RNV
+git pull
+```
+
 ## Contribution and Development
 
 This module is written in TypeScript and compiled with Rollup.  
-The source files are located in the `/src` folder.
-Compile target files with `npm run build`.
+The source files are located in the `/src` directory.
+Compile target files with `node --run build`.
 
 Contribution for this module is welcome!
 

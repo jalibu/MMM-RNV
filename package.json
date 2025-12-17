@@ -3,10 +3,14 @@
   "version": "1.2.0",
   "description": "This is a departure monitor for the Rhein-Neckar-Verkehr (RNV) public transport network for the MagicMirror² platform.",
   "main": "MMM-RNV.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jalibu/MMM-RNV.git"
+  },
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c --sourcemap=inline",
-    "dev:watch": "npm run dev -- --watch",
+    "dev:watch": "node --run dev -- --watch",
     "lint": "eslint && prettier --check .",
     "lint:fix": "eslint --fix && prettier . --write"
   },
@@ -24,14 +28,6 @@
     "url": "https://github.com/jalibu/MMM-RNV/issues"
   },
   "homepage": "https://github.com/jalibu/MMM-RNV#readme",
-  "dependencies": {
-    "apollo-cache-inmemory": "^1.6.6",
-    "apollo-client": "^2.6.10",
-    "apollo-link-context": "^1.0.20",
-    "apollo-link-http": "^1.5.17",
-    "graphql": "^15.5.3",
-    "graphql-tag": "^2.12.5"
-  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-json": "^6.1.0",

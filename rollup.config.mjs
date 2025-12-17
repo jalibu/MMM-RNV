@@ -49,13 +49,7 @@ export default [
     input: './src/backend/Backend.ts',
     external: [
       'logger',
-      'node_helper',
-      'apollo-cache-inmemory',
-      'apollo-client',
-      'apollo-link-context',
-      'apollo-link-http',
-      'graphql-tag',
-      'graphql'
+      'node_helper'
     ],
     plugins: [
       json(),
