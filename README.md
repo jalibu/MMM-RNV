@@ -26,7 +26,7 @@ Contribution welcome.
    npm install --only=production
    ```
 
-3. Request your API Key [here](https://opendata.rnv-online.de/datahub-api).
+3. Request your API Key here: [Data Hub API](https://www.opendata-oepnv.de/ht/de/organisation/verkehrsunternehmen/rnv/openrnv/api). Select **GraphQL** (not GTFS) in the form.
 
 4. [Find the stationId](https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen_mit_haltestellenreferenz.json) of the station that should be displayed.
 
