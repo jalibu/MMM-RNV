@@ -56,7 +56,6 @@ export default [
       'apollo-link-http',
       'graphql-tag',
       'graphql',
-      'node-fetch'
     ],
     plugins: [
       json(),
