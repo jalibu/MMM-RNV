@@ -132,16 +132,16 @@ module.exports = NodeHelper.create({
       })
 
       for (const apiDeparture of apiDepartures) {
-        const plannedIso = apiDeparture.stops[0].plannedDeparture.isoString
-        if (!plannedIso) {
+        const stop = apiDeparture.stops?.[0]
+        if (!stop?.plannedDeparture?.isoString) {
           continue
         }
-        const plannedDepartureDate = new Date(plannedIso)
+        const plannedDepartureDate = new Date(stop.plannedDeparture.isoString)
 
         // Delay calculation
         let delayInMinutes = 0
         try {
-          const realtimeIso = apiDeparture.stops[0].realtimeDeparture.isoString
+          const realtimeIso = stop.realtimeDeparture?.isoString
           if (!realtimeIso) {
             throw new Error('Missing realtime departure')
           }
@@ -155,19 +155,16 @@ module.exports = NodeHelper.create({
         }
 
         const line = apiDeparture.line.id.split('-')[1]
-        if (
-          config.excludeLines.includes(line) ||
-          config.excludePlatforms.includes(apiDeparture.stops[0].pole.platform.label)
-        ) {
+        if (config.excludeLines.includes(line) || config.excludePlatforms.includes(stop.pole.platform.label)) {
           continue
         }
 
         const departure: Departure = {
           line,
-          destination: apiDeparture.stops[0].destinationLabel,
+          destination: stop.destinationLabel,
           departure: plannedDepartureDate.getTime(),
           delayInMin: delayInMinutes,
-          platform: apiDeparture.stops[0].pole.platform.label,
+          platform: stop.pole.platform.label,
           type: apiDeparture.type,
           highlighted: config.highlightLines.includes(line),
           color: this.colorCodesMap.get(line)
