@@ -15,34 +15,34 @@ Contribution welcome.
 
 1. Navigate to the `MagicMirror/modules` directory and execute the following command
 
-   ```sh
-   git clone https://github.com/jalibu/MMM-RNV.git
-   ```
+    ```sh
+    git clone https://github.com/jalibu/MMM-RNV
+    ```
 
 2. Change into the MMM-RNV module folder and install runtime dependencies with
 
-   ```sh
-   cd MMM-RNV
-   npm install --only=production
-   ```
+    ```sh
+    cd MMM-RNV
+    npm install --only=production
+    ```
 
 3. Request your API Key here: [Data Hub API](https://www.opendata-oepnv.de/ht/de/organisation/verkehrsunternehmen/rnv/openrnv/api). Select **GraphQL** (not GTFS) in the form.
 
 4. [Find the stationId](https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen_mit_haltestellenreferenz.json) of the station that should be displayed.
 
-5. Add the module configuration into the `MagicMirror/config/config.js` file (sample configuration):
+5. Add the module configuration into the `config.js` file (sample configuration):
 
-   ```javascript
-    {
-        module: "MMM-RNV",
-        position: "top_left",
-        config: {
+    ```javascript
+        {
+          module: "MMM-RNV",
+          position: "top_left",
+          config: {
             animationSpeedMs: 2 * 1000, // 2 seconds
             credentials: {
-               clientId: "",
-               clientSecret: "",
-               resourceId: "",
-               tenantId: "",
+              clientId: "",
+              clientSecret: "",
+              resourceId: "",
+              tenantId: "",
             },
             excludeLines: [], // example ["N1", "5"]
             excludePlatforms: [], // example ["A"]
@@ -55,9 +55,9 @@ Contribution welcome.
             timeformat: 'HH:mm',
             updateIntervalMs: 1 * 60 * 1000, // every 1 minute
             walkingTimeMs: 3 * 60 * 1000 // 3 minutes footwalk
-        }
-    }
-   ```
+          }
+        },
+    ```
 
 ## Options
 
