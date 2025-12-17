@@ -25,7 +25,7 @@ module.exports = NodeHelper.create({
   start() {
     this.accessToken = null
     this.schedule = []
-    this.colorCodes = []
+    this.colorCodesMap = new Map()
     this.failedRequests = 0
     this.getColorCodes()
   },
@@ -36,7 +36,7 @@ module.exports = NodeHelper.create({
         'https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen-farben.json'
       )
       const json = (await results.json()) as { lineGroups: ColorCode[] }
-      this.colorCodes = json.lineGroups
+      this.colorCodesMap = new Map(json.lineGroups.map((code) => [code.id, code]))
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       Log.warn(`Could not request color codes: ${message}`)
@@ -170,7 +170,7 @@ module.exports = NodeHelper.create({
           platform: apiDeparture.stops[0].pole.platform.label,
           type: apiDeparture.type,
           highlighted: config.highlightLines.includes(line),
-          color: this.colorCodes.find((code: { id: string }) => code.id === line)
+          color: this.colorCodesMap.get(line)
         }
 
         departures.push(departure)
