@@ -71,11 +71,11 @@ module.exports = NodeHelper.create({
       const journeyStart = new Date(Date.now() + config.walkingTimeMs)
 
       Log.info(`Request departures for station '${config.stationId}'`)
-      const query = `query {
-            station(id:"${config.stationId}") {
+      const query = `query GetDepartures($stationId: String!, $startTime: String!) {
+            station(id: $stationId) {
                 hafasID
                 longName
-                journeys(startTime: "${journeyStart.toISOString()}" first: 50) {
+                journeys(startTime: $startTime, first: 50) {
                     totalCount
                     elements {
                         ... on Journey {
@@ -83,7 +83,7 @@ module.exports = NodeHelper.create({
                                 id
                             }
                             type
-                            stops(onlyHafasID: "${config.stationId}") {
+                            stops(onlyHafasID: $stationId) {
                                 pole {
                                     platform {
                                         type
@@ -112,7 +112,10 @@ module.exports = NodeHelper.create({
         }`
 
       const departures: Departure[] = []
-      const apiResponse = await this.fetchGraphql(config.clientApiUrl, query, this.accessToken)
+      const apiResponse = await this.fetchGraphql(config.clientApiUrl, query, this.accessToken, {
+        stationId: config.stationId,
+        startTime: journeyStart.toISOString()
+      })
 
       // Remove elements where depature time is not set
       const apiDepartures = apiResponse.data.station.journeys.elements.filter(
@@ -218,7 +221,8 @@ module.exports = NodeHelper.create({
   async fetchGraphql(
     uri: string,
     query: string,
-    token: string
+    token: string,
+    variables?: Record<string, unknown>
   ): Promise<{
     data: { station: { journeys: { elements: ApiDeparture[] } } }
   }> {
@@ -228,7 +232,7 @@ module.exports = NodeHelper.create({
         'Content-Type': 'application/json',
         authorization: token ? `Bearer ${token}` : ''
       },
-      body: JSON.stringify({ query })
+      body: JSON.stringify({ query, variables })
     })
 
     if (!response.ok) {
