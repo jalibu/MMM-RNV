@@ -6,7 +6,8 @@ interface Logger {
   log: (...args: unknown[]) => void
   info: (...args: unknown[]) => void
   warn: (...args: unknown[]) => void
-  error?: (...args: unknown[]) => void
+  debug: (...args: unknown[]) => void
+  error: (...args: unknown[]) => void
 }
 
 declare const Log: Logger
@@ -46,12 +47,13 @@ Module.register<Config>('MMM-RNV', {
     this.hasLoaded = false
     this.departures = null
     this.errors = null
+    this.updateInterval = null
 
     const { credentials } = this.config
 
     if (credentials?.clientId && credentials?.clientSecret && credentials?.tenantId && credentials?.resourceId) {
       this.getData()
-      setInterval(() => {
+      this.updateInterval = setInterval(() => {
         this.getData()
       }, this.config.updateIntervalMs)
     } else {
@@ -61,6 +63,22 @@ Module.register<Config>('MMM-RNV', {
 
   getData() {
     this.sendSocketNotification('RNV_DEPARTURE_REQUEST', this.config)
+  },
+
+  suspend() {
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval)
+      this.updateInterval = null
+    }
+  },
+
+  resume() {
+    if (!this.updateInterval && this.config.credentials?.clientId) {
+      this.getData()
+      this.updateInterval = setInterval(() => {
+        this.getData()
+      }, this.config.updateIntervalMs)
+    }
   },
 
   // Define required styles.
@@ -98,7 +116,7 @@ Module.register<Config>('MMM-RNV', {
   // Override socket notification handler.
   socketNotificationReceived(notification, payload) {
     if (notification === `RNV_DATA_RESPONSE_${this.config.stationId}`) {
-      Log.log('Departures', payload)
+      Log.debug('Departures', payload)
       this.departures = payload
       this.errors = null
       this.hasLoaded = true
