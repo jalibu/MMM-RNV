@@ -1,6 +1,6 @@
 /*! *****************************************************************************
   mmm-rnv
-  Version 1.2.0
+  Version 1.3.0
 
   This is a departure monitor for the Rhein-Neckar-Verkehr (RNV) public transport network for the MagicMirror² platform.
   Please submit bugs at https://github.com/jalibu/MMM-RNV/issues
