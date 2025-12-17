@@ -14,6 +14,7 @@ export type Config = {
   icons: {
     STRASSENBAHN: string
     STADTBUS: string
+    [key: string]: string
   }
   maxResults: number
   stationId: string

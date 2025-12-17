@@ -14,7 +14,12 @@ Module.register<Config>('MMM-RNV', {
     stationId: '2417',
     showLineColors: true,
     maxResults: 10,
-    credentials: null,
+    credentials: {
+      clientId: '',
+      clientSecret: '',
+      resourceId: '',
+      tenantId: ''
+    },
     clientApiUrl: 'https://graphql-sandbox-dds.rnv-online.de',
     timeformat: 'HH:mm',
     showPlatform: false,
