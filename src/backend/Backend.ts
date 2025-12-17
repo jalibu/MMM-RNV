@@ -8,15 +8,20 @@ import * as Log from 'logger'
 import { Departure } from '../types/Departure'
 import { Config } from '../types/Config'
 
-type ApiDeparture = {
+interface ApiDeparture {
   line: { id: string }
   type: string
-  stops: Array<{
+  stops: {
     pole: { platform: { label: string } }
     destinationLabel: string
     plannedDeparture: { isoString: string | null }
     realtimeDeparture: { isoString: string | null }
-  }>
+  }[]
+}
+
+interface ColorCode {
+  id: string
+  [key: string]: unknown
 }
 
 module.exports = NodeHelper.create({
@@ -33,7 +38,7 @@ module.exports = NodeHelper.create({
       const results = await fetch(
         'https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen-farben.json'
       )
-      const json = (await results.json()) as any
+      const json = (await results.json()) as { lineGroups: ColorCode[] }
       this.colorCodes = json.lineGroups
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
@@ -57,7 +62,7 @@ module.exports = NodeHelper.create({
           this.client = await this.createClient(config)
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err)
-          Log.error(`Error generating the client: ${message}`)
+          ;(Log.error ?? Log.warn)(`Error generating the client: ${message}`)
           this.sendSocketNotification('RNV_ERROR_RESPONSE', {
             type: 'WARNING',
             message: 'Error with API authentication.'
@@ -119,20 +124,28 @@ module.exports = NodeHelper.create({
 
       // Sorting fetched data based on the departure times
       apiDepartures.sort((a: ApiDeparture, b: ApiDeparture) => {
-        const depA = a.stops[0].plannedDeparture.isoString!
-        const depB = b.stops[0].plannedDeparture.isoString!
+        const depA = a.stops[0].plannedDeparture.isoString
+        const depB = b.stops[0].plannedDeparture.isoString
 
-        /* eslint-disable-next-line no-nested-ternary */
+        if (!depA || !depB) return 0
         return depA < depB ? -1 : depA > depB ? 1 : 0
       })
 
       for (const apiDeparture of apiDepartures) {
-        const plannedDepartureDate = new Date(apiDeparture.stops[0].plannedDeparture.isoString as string)
+        const plannedIso = apiDeparture.stops[0].plannedDeparture.isoString
+        if (!plannedIso) {
+          continue
+        }
+        const plannedDepartureDate = new Date(plannedIso)
 
         // Delay calculation
         let delayInMinutes = 0
         try {
-          const realtimeDepartureDate = new Date(apiDeparture.stops[0].realtimeDeparture.isoString as string)
+          const realtimeIso = apiDeparture.stops[0].realtimeDeparture.isoString
+          if (!realtimeIso) {
+            throw new Error('Missing realtime departure')
+          }
+          const realtimeDepartureDate = new Date(realtimeIso)
           // Positive => delayed, Negative => early
           const delayInMs = realtimeDepartureDate.getTime() - plannedDepartureDate.getTime()
           delayInMinutes = Math.round(delayInMs / (60 * 1000))
@@ -200,17 +213,17 @@ module.exports = NodeHelper.create({
     if (!response.ok) {
       throw Error(`Could not fetch the access token (${response.status} ${response.statusText})`)
     }
-    /* eslint-disable-next-line camelcase */
+
     const { access_token } = await response.json()
     Log.log('Created new RNV API access token')
 
-    const httpLink = createHttpLink({ uri: config.clientApiUrl, fetch: fetch as any })
+    const httpLink = createHttpLink({ uri: config.clientApiUrl, fetch })
 
     const middlewareAuthLink = setContext(async (_, { headers }) => {
       return {
         headers: {
           ...headers,
-          /* eslint-disable-next-line camelcase */
+
           authorization: access_token ? `Bearer ${access_token}` : null
         }
       }

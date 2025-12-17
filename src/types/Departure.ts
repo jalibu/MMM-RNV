@@ -1,4 +1,4 @@
-export type Departure = {
+export interface Departure {
   line: string
   destination: string
   departure: number
@@ -9,7 +9,7 @@ export type Departure = {
   color?: Color
 }
 
-export type Color = {
+export interface Color {
   id: string
   primary: {
     hex: string

@@ -2,8 +2,15 @@ import Utils from './Utils'
 import { Config } from '../types/Config'
 
 // Global or injected variable declarations
-declare const Log: any
-declare const moment: any
+interface Logger {
+  log: (...args: unknown[]) => void
+  info: (...args: unknown[]) => void
+  warn: (...args: unknown[]) => void
+  error?: (...args: unknown[]) => void
+}
+
+declare const Log: Logger
+declare const moment: (value?: unknown) => unknown
 
 Module.register<Config>('MMM-RNV', {
   // Default module config.

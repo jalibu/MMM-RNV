@@ -15,16 +15,16 @@ Contribution welcome.
 
 1. Navigate to the `MagicMirror/modules` directory and execute the following command
 
-    ```sh
-    git clone https://github.com/jalibu/MMM-RNV
-    ```
+   ```sh
+   git clone https://github.com/jalibu/MMM-RNV
+   ```
 
 2. Change into the MMM-RNV module folder and install runtime dependencies with
 
-    ```sh
-    cd MMM-RNV
-    npm install --only=production
-    ```
+   ```sh
+   cd MMM-RNV
+   npm install --only=production
+   ```
 
 3. Request your API Key here: [Data Hub API](https://www.opendata-oepnv.de/ht/de/organisation/verkehrsunternehmen/rnv/openrnv/api). Select **GraphQL** (not GTFS) in the form.
 
@@ -32,32 +32,32 @@ Contribution welcome.
 
 5. Add the module configuration into the `config.js` file (sample configuration):
 
-    ```javascript
-        {
-          module: "MMM-RNV",
-          position: "top_left",
-          config: {
-            animationSpeedMs: 2 * 1000, // 2 seconds
-            credentials: {
-              clientId: "",
-              clientSecret: "",
-              resourceId: "",
-              tenantId: "",
-            },
-            excludeLines: [], // example ["N1", "5"]
-            excludePlatforms: [], // example ["A"]
-            highlightLines: [], // example ["1"]
-            maxResults: 10,
-            showLineColors: true,
-            showPlatform: false,
-            showTableHeadersAsSymbols: false,
-            stationId: '2417',
-            timeformat: 'HH:mm',
-            updateIntervalMs: 1 * 60 * 1000, // every 1 minute
-            walkingTimeMs: 3 * 60 * 1000 // 3 minutes footwalk
-          }
-        },
-    ```
+   ```javascript
+       {
+         module: "MMM-RNV",
+         position: "top_left",
+         config: {
+           animationSpeedMs: 2 * 1000, // 2 seconds
+           credentials: {
+             clientId: "",
+             clientSecret: "",
+             resourceId: "",
+             tenantId: "",
+           },
+           excludeLines: [], // example ["N1", "5"]
+           excludePlatforms: [], // example ["A"]
+           highlightLines: [], // example ["1"]
+           maxResults: 10,
+           showLineColors: true,
+           showPlatform: false,
+           showTableHeadersAsSymbols: false,
+           stationId: '2417',
+           timeformat: 'HH:mm',
+           updateIntervalMs: 1 * 60 * 1000, // every 1 minute
+           walkingTimeMs: 3 * 60 * 1000 // 3 minutes footwalk
+         }
+       },
+   ```
 
 ## Options
 

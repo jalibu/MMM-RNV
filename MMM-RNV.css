@@ -6,18 +6,18 @@
  */
 
 .MMM-RNV {
-    text-align: left;
+  text-align: left;
 }
 
-table.rnv-schedule{
-    font-size: 0.5em;
-    border-spacing: 0.4em;
+table.rnv-schedule {
+  font-size: 0.5em;
+  border-spacing: 0.4em;
 }
 
 .rnv-delay {
-    color: red;
+  color: red;
 }
 
 .rnv-delay.rnv-early {
-    color: green;
+  color: green;
 }
