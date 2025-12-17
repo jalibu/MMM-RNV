@@ -121,8 +121,9 @@ module.exports = NodeHelper.create({
         let delayInMinutes = 0
         try {
           const realtimeDepartureDate = new Date(apiDeparture.stops[0].realtimeDeparture.isoString)
-          const delayInMs = Math.abs(plannedDepartureDate.getMilliseconds() - realtimeDepartureDate.getMilliseconds())
-          delayInMinutes = Math.floor((delayInMs / 60) * 1000)
+          // Positive => delayed, Negative => early
+          const delayInMs = realtimeDepartureDate.getTime() - plannedDepartureDate.getTime()
+          delayInMinutes = Math.round(delayInMs / (60 * 1000))
         } catch (err) {
           Log.warn(`Error calculating the delay: ${err.message}`)
         }
