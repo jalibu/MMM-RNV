@@ -51,7 +51,7 @@ module.exports = NodeHelper.create({
     }
   },
 
-  async getData(config: Config) {
+  async getData(config: Config, isRetry = false) {
     try {
       // Create client
       if (!this.accessToken) {
@@ -61,7 +61,7 @@ module.exports = NodeHelper.create({
           const message = err instanceof Error ? err.message : String(err)
           ;(Log.error ?? Log.warn)(`Error generating the client: ${message}`)
           this.sendSocketNotification('RNV_ERROR_RESPONSE', {
-            type: 'WARNING',
+            type: 'ERROR',
             message: 'Error with API authentication.'
           })
 
@@ -182,17 +182,26 @@ module.exports = NodeHelper.create({
       this.sendSocketNotification(`RNV_DATA_RESPONSE_${config.stationId}`, departures)
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
+      const status = err instanceof Error ? (err as Error & { status?: number }).status : undefined
+
+      // Auth errors: reset token and retry once
+      if ((status === 401 || status === 403) && !isRetry) {
+        Log.warn(`Authentication error (${status}), resetting token and retrying...`)
+        this.accessToken = null
+        this.getData(config, true)
+        return
+      }
+
+      // Other errors or failed retry
       Log.warn(`Error fetching the data from the API: ${message}`)
       this.failedRequests += 1
 
       if (this.failedRequests > 5) {
-        this.accessToken = null
-        Log.log('Reset the RNV API access token')
-
         this.sendSocketNotification('RNV_ERROR_RESPONSE', {
-          type: 'WARNING',
+          type: 'ERROR',
           message: 'Error fetching data.'
         })
+        this.failedRequests = 0
       }
     }
   },
@@ -200,14 +209,25 @@ module.exports = NodeHelper.create({
   async createAccessToken(config: Config): Promise<string> {
     const { clientId, clientSecret, resourceId, tenantId } = config.credentials
 
+    const body = new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: clientId,
+      client_secret: clientSecret,
+      resource: resourceId
+    })
+
     const response = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}&resource=${resourceId}`
+      body: body.toString()
     })
 
     if (!response.ok) {
-      throw Error(`Could not fetch the access token (${response.status} ${response.statusText})`)
+      const error: Error & { status?: number } = new Error(
+        `Could not fetch the access token (${response.status} ${response.statusText})`
+      )
+      error.status = response.status
+      throw error
     }
 
     const { access_token } = (await response.json()) as { access_token: string }
@@ -233,7 +253,11 @@ module.exports = NodeHelper.create({
     })
 
     if (!response.ok) {
-      throw Error(`GraphQL request failed (${response.status} ${response.statusText})`)
+      const error: Error & { status?: number } = new Error(
+        `GraphQL request failed (${response.status} ${response.statusText})`
+      )
+      error.status = response.status
+      throw error
     }
 
     const body = (await response.json()) as {
