@@ -57,7 +57,7 @@
     "prettier": "^3.7.4",
     "rollup": "^4.53.5",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.0",
+    "typescript-eslint": "^8.54.0",
     "commit-and-tag-version": "^12.6.1",
     "simple-git-hooks": "^2.13.1"
   }
