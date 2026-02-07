@@ -104,6 +104,7 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 | Script                  | Purpose                                                   |
 | ----------------------- | --------------------------------------------------------- |
 | `node --run build`      | Production build (minified, optimized)                    |
+| `node --run demo`       | Start MagicMirror with demo config showcasing and testing the module. |
 | `node --run dev`        | Development build with inline sourcemaps                  |
 | `node --run dev:watch`  | Watch mode for active development                         |
 | `node --run test`       | Full quality check (TypeScript + ESLint + Prettier)       |

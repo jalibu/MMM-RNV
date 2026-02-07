@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "rollup -c",
+    "demo": "cd ../../ && MM_CONFIG_FILE=modules/MMM-RNV/demo.config.js node --run start:dev",
     "dev": "rollup -c --sourcemap=inline",
     "dev:watch": "node --run dev -- --watch",
     "lint": "eslint && prettier --check .",
