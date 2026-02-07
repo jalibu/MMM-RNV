@@ -15,7 +15,7 @@
     "lint": "eslint && prettier --check .",
     "lint:fix": "eslint --fix && prettier . --write",
     "prepare": "simple-git-hooks",
-    "release": "commit-and-tag-version",
+    "release": "commit-and-tag-version --config ./changelog.config.js",
     "test": "node --run type-check && node --run lint",
     "type-check": "tsc --noEmit"
   },
