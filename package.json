@@ -15,7 +15,7 @@
     "lint:fix": "eslint --fix && prettier . --write",
     "prepare": "simple-git-hooks",
     "release": "commit-and-tag-version",
-    "test": "npm run type-check && npm run lint",
+    "test": "node --run type-check && node --run lint",
     "type-check": "tsc --noEmit"
   },
   "keywords": [
@@ -33,12 +33,12 @@
   },
   "homepage": "https://github.com/jalibu/MMM-RNV#readme",
   "simple-git-hooks": {
-    "pre-commit": "npm run test",
-    "pre-push": "npm run build"
+    "pre-commit": "node --run test",
+    "pre-push": "node --run build"
   },
   "commit-and-tag-version": {
     "scripts": {
-      "postbump": "npm run build && git add MMM-RNV.js node_helper.js"
+      "postbump": "node --run build && git add MMM-RNV.js node_helper.js"
     },
     "skip": {
       "commit": false

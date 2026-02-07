@@ -2,7 +2,7 @@
 
 [![version](https://img.shields.io/github/package-json/v/jalibu/MMM-RNV)](https://github.com/jalibu/MMM-RNV/releases) [![Known Vulnerabilities](https://snyk.io/test/github/jalibu/MMM-RNV/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jalibu/MMM-RNV?targetFile=package.json)
 
-This is a departure monitor for the Rhein-Neckar-Verkehr (RNV) public transport network for the [MagicMirror²](https://magicmirror.builders/) platform.  
+This is a departure monitor for the Rhein-Neckar-Verkehr (RNV) public transport network for the [MagicMirror²](https://magicmirror.builders/) platform.
 It shows upcoming departures with their destination, type, delay and platform.
 
 Contribution welcome.
@@ -89,7 +89,7 @@ git pull
 
 ## Contribution and Development
 
-This module is written in TypeScript and compiled with Rollup.  
+This module is written in TypeScript and compiled with Rollup.
 The source files are located in the `/src` directory.
 Compile target files with `node --run build`.
 
@@ -128,8 +128,8 @@ node --run release
 
 Following Git hooks are automatically activated (via simple-git-hooks):
 
-- **pre-commit**: runs `npm run test`
-- **pre-push**: runs `npm run build`
+- **pre-commit**: runs `node --run test`
+- **pre-push**: runs `node --run build`
 
 ### Release
 
