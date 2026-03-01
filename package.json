@@ -58,7 +58,7 @@
     "eslint": "^9.39.2",
     "eslint-plugin-jsdoc": "^62.5.3",
     "prettier": "^3.8.1",
-    "rollup": "^4.57.1",
+    "rollup": "^4.59.0",
     "simple-git-hooks": "^2.13.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.54.0"
