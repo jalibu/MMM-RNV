@@ -16,7 +16,8 @@
     "lint:fix": "eslint --fix && prettier . --write",
     "prepare": "simple-git-hooks",
     "release": "commit-and-tag-version --config ./changelog.config.js",
-    "test": "node --run type-check && node --run lint",
+    "test": "node --run type-check && node --run lint && node --run test:unit",
+    "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/unit/**/*.test.mts",
     "type-check": "tsc --noEmit"
   },
   "keywords": [

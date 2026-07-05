@@ -50,8 +50,9 @@ export default [
     external: ['logger', 'node_helper'],
     plugins: [
       json(),
-      typescript({ tsconfig: './tsconfig.json', module: 'NodeNext', moduleResolution: 'NodeNext' }),
+      typescript({ tsconfig: './tsconfig.json', module: 'ESNext', moduleResolution: 'Bundler' }),
       nodeResolve(),
+      commonjs(),
       terser({
         format: {
           comments: false,

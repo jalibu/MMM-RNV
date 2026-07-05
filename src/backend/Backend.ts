@@ -1,24 +1,16 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const module: any
-import * as NodeHelper from 'node_helper'
+import NodeHelper from 'node_helper'
 import * as Log from 'logger'
-import { Departure } from '../types/Departure'
+import { Color, Departure } from '../types/Departure'
 import { Config } from '../types/Config'
-
-interface ApiDeparture {
-  line: { id: string }
-  type: string
-  stops: {
-    pole: { platform: { label: string } }
-    destinationLabel: string
-    plannedDeparture: { isoString: string | null }
-    realtimeDeparture: { isoString: string | null }
-  }[]
-}
+import { ApiDeparture, mapApiDepartures } from './DepartureMapper'
 
 interface ColorCode {
   id: string
-  [key: string]: unknown
+  primary: Color['primary']
+  secondary: Color['secondary']
+  contrast: Color['contrast']
 }
 
 module.exports = NodeHelper.create({
@@ -111,70 +103,19 @@ module.exports = NodeHelper.create({
             }
         }`
 
-      const departures: Departure[] = []
       const apiResponse = await this.fetchGraphql(config.clientApiUrl, query, this.accessToken, {
         stationId: config.stationId,
         startTime: journeyStart.toISOString()
       })
 
-      // Remove elements where depature time is not set
-      const apiDepartures = apiResponse.data.station.journeys.elements.filter(
-        (journey: ApiDeparture) => journey.stops[0].plannedDeparture.isoString !== null
-      )
-
-      // Sorting fetched data based on the departure times
-      apiDepartures.sort((a: ApiDeparture, b: ApiDeparture) => {
-        const depA = a.stops[0].plannedDeparture.isoString
-        const depB = b.stops[0].plannedDeparture.isoString
-
-        if (!depA || !depB) return 0
-        return depA < depB ? -1 : depA > depB ? 1 : 0
+      const departures: Departure[] = mapApiDepartures(apiResponse.data.station.journeys.elements, {
+        excludeLines: config.excludeLines,
+        excludePlatforms: config.excludePlatforms,
+        highlightLines: config.highlightLines,
+        maxResults: config.maxResults,
+        colorCodesMap: this.colorCodesMap as Map<string, Departure['color']>,
+        warn: (message) => Log.warn(message)
       })
-
-      for (const apiDeparture of apiDepartures) {
-        const stop = apiDeparture.stops?.[0]
-        if (!stop?.plannedDeparture?.isoString) {
-          continue
-        }
-        const plannedDepartureDate = new Date(stop.plannedDeparture.isoString)
-
-        // Delay calculation
-        let delayInMinutes = 0
-        try {
-          const realtimeIso = stop.realtimeDeparture?.isoString
-          if (!realtimeIso) {
-            throw new Error('Missing realtime departure')
-          }
-          const realtimeDepartureDate = new Date(realtimeIso)
-          // Positive => delayed, Negative => early
-          const delayInMs = realtimeDepartureDate.getTime() - plannedDepartureDate.getTime()
-          delayInMinutes = Math.round(delayInMs / (60 * 1000))
-        } catch (err) {
-          const message = err instanceof Error ? err.message : String(err)
-          Log.warn(`Error calculating the delay: ${message}`)
-        }
-
-        const line = apiDeparture.line.id.split('-')[1]
-        if (config.excludeLines.includes(line) || config.excludePlatforms.includes(stop.pole.platform.label)) {
-          continue
-        }
-
-        const departure: Departure = {
-          line,
-          destination: stop.destinationLabel,
-          departure: plannedDepartureDate.getTime(),
-          delayInMin: delayInMinutes,
-          platform: stop.pole.platform.label,
-          type: apiDeparture.type,
-          highlighted: config.highlightLines.includes(line),
-          color: this.colorCodesMap.get(line)
-        }
-
-        departures.push(departure)
-        if (departures.length === config.maxResults) {
-          break
-        }
-      }
 
       this.failedRequests = 0
 
