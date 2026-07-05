@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.4.0](https://github.com/jalibu/MMM-RNV/compare/v1.3.1...v1.4.0) (2026-07-05)
+
+
+### Added
+
+* harden backend retry logic with backoff ([abba2c2](https://github.com/jalibu/MMM-RNV/commit/abba2c2e772ec74d7459e6214517034b005796d1))
+
+
+### Performance Improvements
+
+* preformat departure times when data is received ([b48c2bd](https://github.com/jalibu/MMM-RNV/commit/b48c2bd9a22c3214e26416fe58e5bdce823f8b1b))
+
+
+### Documentation
+
+* refine configuration section ([a3cd4b6](https://github.com/jalibu/MMM-RNV/commit/a3cd4b662f7fc758df150bd329383217f9560322))
+
+
+### Chores
+
+* install missing build dependency ([61d3ca4](https://github.com/jalibu/MMM-RNV/commit/61d3ca40da40d197b4e854522d65d24f701e6e93))
+* restore TS checks after eslint upgrade ([fd1390e](https://github.com/jalibu/MMM-RNV/commit/fd1390e78f745f64f234fe17f6704e474a9b6de6))
+* update devDependencies ([50f665a](https://github.com/jalibu/MMM-RNV/commit/50f665a0a5ab6c4381b177a3d0f537fef2639568))
+* update TypeScript plugin configuration to include module resolution ([d603d6b](https://github.com/jalibu/MMM-RNV/commit/d603d6b42391aa8e9a909caed88978700f37fb2a))
+
+
+### Code Refactoring
+
+* extract departure mapping into tested module ([8b45d37](https://github.com/jalibu/MMM-RNV/commit/8b45d3741951832160b2c76e95df8b26bfd58986))
+* remove moment and use Intl for departure times ([101d702](https://github.com/jalibu/MMM-RNV/commit/101d702dac1225fd7ad021bc2c22ecad58cc893b))
+
 ## [1.3.1](https://github.com/jalibu/MMM-RNV/compare/v1.3.0...v1.3.1) (2026-02-07)
 
 
