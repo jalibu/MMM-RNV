@@ -23,35 +23,38 @@ Contribution welcome.
 
 3. [Find the stationId](https://rnvopendataportalpublic.blob.core.windows.net/public/openDataPortal/liniengruppen_mit_haltestellenreferenz.json) of the station that should be displayed.
 
-4. Add the module configuration into the `config.js` file (sample configuration):
-   ```javascript
-   {
-     module: 'MMM-RNV',
-     position: 'top_left',
-     config: {
-       animationSpeedMs: 2 * 1000, // 2 seconds
-       credentials: {
-         clientId: '',
-         clientSecret: '',
-         resourceId: '',
-         tenantId: ''
-       },
-       excludeLines: [], // example ["N1", "5"]
-       excludePlatforms: [], // example ["A"]
-       highlightLines: [], // example ["1"]
-       maxResults: 10,
-       showLineColors: true,
-       showPlatform: false,
-       showTableHeadersAsSymbols: false,
-       stationId: '2417',
-       timeformat: 'HH:mm',
-       updateIntervalMs: 1 * 60 * 1000, // every 1 minute
-       walkingTimeMs: 3 * 60 * 1000 // 3 minutes footwalk
-     }
-   },
-   ```
+## Configuration
 
-## Options
+Add the module configuration into the `config.js` file (sample configuration):
+
+```javascript
+    {
+      module: 'MMM-RNV',
+      position: 'top_left',
+      config: {
+        animationSpeedMs: 2 * 1000, // 2 seconds
+        credentials: {
+          clientId: '',
+          clientSecret: '',
+          resourceId: '',
+          tenantId: ''
+        },
+        excludeLines: [], // example ["N1", "5"]
+        excludePlatforms: [], // example ["A"]
+        highlightLines: [], // example ["1"]
+        maxResults: 10,
+        showLineColors: true,
+        showPlatform: false,
+        showTableHeadersAsSymbols: false,
+        stationId: '2417',
+        timeformat: 'HH:mm',
+        updateIntervalMs: 1 * 60 * 1000, // every 1 minute
+        walkingTimeMs: 3 * 60 * 1000 // 3 minutes footwalk
+      }
+    },
+```
+
+### Options
 
 | Option                      | Description                                                                                                                                       |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -69,7 +72,7 @@ Contribution welcome.
 | `updateIntervalMs`          | Determines how often updates should be loaded from server. <br><br>**Type:** `int` <br> **Default value:** `60000` (every 1 minute)               |
 | `walkingTimeMs`             | Filter for departures that are reachable considering the walking time.<br><br>**Type:** `int` <br> **Default value:** `3 * 60 * 1000` (3 minutes) |
 
-## Credentials Object
+### Credentials Object
 
 | Option         | Description                                                              |
 | -------------- | ------------------------------------------------------------------------ |
