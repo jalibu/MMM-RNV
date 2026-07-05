@@ -13,6 +13,40 @@ interface ColorCode {
   contrast: Color['contrast']
 }
 
+const MAX_ATTEMPTS = 3
+const RETRY_BASE_DELAY_MS = 1000
+const MAX_CONSECUTIVE_FAILURES = 5
+const MAX_RETRY_AFTER_DELAY_MS = 5 * 60 * 1000
+
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
+
+const parseRetryAfterHeader = (value: string | null): number | undefined => {
+  if (!value) {
+    return undefined
+  }
+
+  const seconds = Number(value)
+  if (Number.isFinite(seconds) && seconds >= 0) {
+    return Math.min(Math.round(seconds * 1000), MAX_RETRY_AFTER_DELAY_MS)
+  }
+
+  const retryDateMs = Date.parse(value)
+  if (Number.isNaN(retryDateMs)) {
+    return undefined
+  }
+
+  return Math.min(Math.max(retryDateMs - Date.now(), 0), MAX_RETRY_AFTER_DELAY_MS)
+}
+
+// Network errors (no status) and transient server/auth/rate-limit responses are worth retrying.
+const isRetryableStatus = (status?: number): boolean =>
+  status === undefined || status === 401 || status === 403 || status === 429 || (status >= 500 && status <= 599)
+
+interface RetryAwareError extends Error {
+  status?: number
+  retryAfterMs?: number
+}
+
 module.exports = NodeHelper.create({
   start() {
     this.accessToken = null
@@ -43,12 +77,12 @@ module.exports = NodeHelper.create({
     }
   },
 
-  async getData(config: Config, isRetry = false) {
+  async getData(config: Config) {
     try {
-      // Create client
+      // Create client (with retry for transient failures)
       if (!this.accessToken) {
         try {
-          this.accessToken = await this.createAccessToken(config)
+          this.accessToken = await this.withRetry(() => this.createAccessToken(config), 'Access token request')
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err)
           ;(Log.error ?? Log.warn)(`Error generating the client: ${message}`)
@@ -60,9 +94,7 @@ module.exports = NodeHelper.create({
           return
         }
       }
-      const journeyStart = new Date(Date.now() + config.walkingTimeMs)
 
-      Log.info(`Request departures for station '${config.stationId}'`)
       const query = `query GetDepartures($stationId: String!, $startTime: String!) {
             station(id: $stationId) {
                 hafasID
@@ -103,19 +135,38 @@ module.exports = NodeHelper.create({
             }
         }`
 
-      const apiResponse = await this.fetchGraphql(config.clientApiUrl, query, this.accessToken, {
-        stationId: config.stationId,
-        startTime: journeyStart.toISOString()
-      })
+      const departures: Departure[] = await this.withRetry(async () => {
+        // A rejected token is dropped below, so re-acquire it before retrying.
+        if (!this.accessToken) {
+          this.accessToken = await this.createAccessToken(config)
+        }
 
-      const departures: Departure[] = mapApiDepartures(apiResponse.data.station.journeys.elements, {
-        excludeLines: config.excludeLines,
-        excludePlatforms: config.excludePlatforms,
-        highlightLines: config.highlightLines,
-        maxResults: config.maxResults,
-        colorCodesMap: this.colorCodesMap as Map<string, Departure['color']>,
-        warn: (message) => Log.warn(message)
-      })
+        const journeyStart = new Date(Date.now() + config.walkingTimeMs)
+        Log.info(`Request departures for station '${config.stationId}'`)
+
+        try {
+          const apiResponse = await this.fetchGraphql(config.clientApiUrl, query, this.accessToken, {
+            stationId: config.stationId,
+            startTime: journeyStart.toISOString()
+          })
+
+          return mapApiDepartures(apiResponse.data.station.journeys.elements, {
+            excludeLines: config.excludeLines,
+            excludePlatforms: config.excludePlatforms,
+            highlightLines: config.highlightLines,
+            maxResults: config.maxResults,
+            colorCodesMap: this.colorCodesMap as Map<string, Departure['color']>,
+            warn: (message) => Log.warn(message)
+          })
+        } catch (err) {
+          const status = err instanceof Error ? (err as Error & { status?: number }).status : undefined
+          // Drop an expired/rejected token so the next attempt requests a fresh one.
+          if (status === 401 || status === 403) {
+            this.accessToken = null
+          }
+          throw err
+        }
+      }, 'Departure request')
 
       this.failedRequests = 0
 
@@ -123,26 +174,37 @@ module.exports = NodeHelper.create({
       this.sendSocketNotification(`RNV_DATA_RESPONSE_${config.stationId}`, departures)
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
-      const status = err instanceof Error ? (err as Error & { status?: number }).status : undefined
 
-      // Auth errors: reset token and retry once
-      if ((status === 401 || status === 403) && !isRetry) {
-        Log.warn(`Authentication error (${status}), resetting token and retrying...`)
-        this.accessToken = null
-        this.getData(config, true)
-        return
-      }
-
-      // Other errors or failed retry
       Log.warn(`Error fetching the data from the API: ${message}`)
       this.failedRequests += 1
 
-      if (this.failedRequests > 5) {
+      if (this.failedRequests > MAX_CONSECUTIVE_FAILURES) {
         this.sendSocketNotification('RNV_ERROR_RESPONSE', {
           type: 'ERROR',
           message: 'Error fetching data.'
         })
         this.failedRequests = 0
+      }
+    }
+  },
+
+  // Runs an operation with bounded exponential-backoff retries for transient failures.
+  async withRetry<T>(operation: () => Promise<T>, label: string): Promise<T> {
+    for (let attempt = 1; ; attempt++) {
+      try {
+        return await operation()
+      } catch (err) {
+        const status = err instanceof Error ? (err as RetryAwareError).status : undefined
+        if (!isRetryableStatus(status) || attempt >= MAX_ATTEMPTS) {
+          throw err
+        }
+
+        const retryAfterMs = err instanceof Error ? (err as RetryAwareError).retryAfterMs : undefined
+        const delayMs =
+          status === 429 && retryAfterMs !== undefined ? retryAfterMs : RETRY_BASE_DELAY_MS * 2 ** (attempt - 1)
+        const message = err instanceof Error ? err.message : String(err)
+        Log.warn(`${label} failed (${message}). Retrying in ${delayMs} ms (attempt ${attempt}/${MAX_ATTEMPTS - 1})...`)
+        await sleep(delayMs)
       }
     }
   },
@@ -164,10 +226,13 @@ module.exports = NodeHelper.create({
     })
 
     if (!response.ok) {
-      const error: Error & { status?: number } = new Error(
+      const error: RetryAwareError = new Error(
         `Could not fetch the access token (${response.status} ${response.statusText})`
       )
       error.status = response.status
+      if (response.status === 429) {
+        error.retryAfterMs = parseRetryAfterHeader(response.headers.get('retry-after'))
+      }
       throw error
     }
 
@@ -194,10 +259,11 @@ module.exports = NodeHelper.create({
     })
 
     if (!response.ok) {
-      const error: Error & { status?: number } = new Error(
-        `GraphQL request failed (${response.status} ${response.statusText})`
-      )
+      const error: RetryAwareError = new Error(`GraphQL request failed (${response.status} ${response.statusText})`)
       error.status = response.status
+      if (response.status === 429) {
+        error.retryAfterMs = parseRetryAfterHeader(response.headers.get('retry-after'))
+      }
       throw error
     }
 
