@@ -43,7 +43,7 @@ module.exports = NodeHelper.create({
     }
   },
 
-  async socketNotificationReceived(notification, payload) {
+  async socketNotificationReceived(notification: string, payload: Config) {
     if (notification === 'RNV_DEPARTURE_REQUEST') {
       const config = payload
       // Retrieve data from RNV-Server

@@ -114,7 +114,7 @@ Module.register<Config>('MMM-RNV', {
   },
 
   // Override socket notification handler.
-  socketNotificationReceived(notification, payload) {
+  socketNotificationReceived(notification: string, payload: unknown) {
     if (notification === `RNV_DATA_RESPONSE_${this.config.stationId}`) {
       Log.debug('Departures', payload)
       this.departures = payload
