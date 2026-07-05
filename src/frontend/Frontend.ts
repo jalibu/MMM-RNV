@@ -1,5 +1,6 @@
 import Utils from './Utils'
 import { Config } from '../types/Config'
+import { Departure } from '../types/Departure'
 
 // Global or injected variable declarations
 interface Logger {
@@ -11,7 +12,6 @@ interface Logger {
 }
 
 declare const Log: Logger
-declare const moment: (value?: unknown) => unknown
 
 Module.register<Config>('MMM-RNV', {
   // Default module config.
@@ -29,7 +29,6 @@ Module.register<Config>('MMM-RNV', {
       tenantId: ''
     },
     clientApiUrl: 'https://graphql-sandbox-dds.rnv-online.de',
-    timeformat: 'HH:mm',
     showPlatform: false,
     showTableHeadersAsSymbols: false,
     highlightLines: [],
@@ -48,6 +47,11 @@ Module.register<Config>('MMM-RNV', {
     this.departures = null
     this.errors = null
     this.updateInterval = null
+    this.dateFormatter = new Intl.DateTimeFormat(config.language, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: config.timeFormat === 12
+    })
 
     const { credentials } = this.config
 
@@ -86,10 +90,6 @@ Module.register<Config>('MMM-RNV', {
     return ['MMM-RNV.css', 'font-awesome.css']
   },
 
-  getScripts() {
-    return ['moment.js']
-  },
-
   // Define required translations.
   getTranslations() {
     return {
@@ -104,12 +104,16 @@ Module.register<Config>('MMM-RNV', {
   getTemplateData() {
     const utils = new Utils(this.config)
 
+    const departures = (this.departures ?? []).map((departure: Departure) => ({
+      ...departure,
+      formattedDepartureTime: this.dateFormatter.format(new Date(departure.departure))
+    }))
+
     return {
-      departures: this.departures,
+      departures,
       config: this.config,
       errors: this.errors,
-      utils,
-      moment
+      utils
     }
   },
 

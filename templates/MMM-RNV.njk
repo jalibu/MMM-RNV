@@ -28,7 +28,7 @@
             {% for departure in departures %}
             <tr class="{% if departure.highlighted %}bright{% endif %}">
                <td class="rnv-data-time">
-                  {{ moment(departure.departure).format(config.timeformat) }}
+                  {{ departure.formattedDepartureTime }}
                   {% if departure.delayInMin !== 0 %}
                      {% if departure.delayInMin < 0 %}
                         <span class="rnv-delay rnv-early">{{ departure.delayInMin }}</span>

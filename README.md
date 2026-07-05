@@ -47,7 +47,6 @@ Add the module configuration into the `config.js` file (sample configuration):
         showPlatform: false,
         showTableHeadersAsSymbols: false,
         stationId: '2417',
-        timeformat: 'HH:mm',
         updateIntervalMs: 1 * 60 * 1000, // every 1 minute
         walkingTimeMs: 3 * 60 * 1000 // 3 minutes footwalk
       }
@@ -68,9 +67,10 @@ Add the module configuration into the `config.js` file (sample configuration):
 | `showPlatform`              | Set to true, to display platform. <br><br>**Type:** `boolean` <br> **Default value:** `false`                                                     |
 | `showTableHeadersAsSymbols` | Set to true, to show symbols instead of texts in header. <br><br>**Type:** `boolean` <br> **Default value:** `false`                              |
 | `stationId`                 | ID of the station that should be displayed.<br><br>**Type:** `int` <br> **Default value:** `2417` (Mannheim Hbf)                                  |
-| `timeformat`                | Time format for the departure time. <br><br>**Type:** `string` <br> **Default value:** `HH:mm`                                                    |
 | `updateIntervalMs`          | Determines how often updates should be loaded from server. <br><br>**Type:** `int` <br> **Default value:** `60000` (every 1 minute)               |
 | `walkingTimeMs`             | Filter for departures that are reachable considering the walking time.<br><br>**Type:** `int` <br> **Default value:** `3 * 60 * 1000` (3 minutes) |
+
+Departure times are formatted via `Intl.DateTimeFormat` using your global MagicMirror language and 12/24-hour setting.
 
 ### Credentials Object
 

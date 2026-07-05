@@ -21,7 +21,6 @@ export interface Config {
   showLineColors: boolean
   showPlatform: boolean
   showTableHeadersAsSymbols: boolean
-  timeformat: string
   updateIntervalMs: number
   walkingTimeMs: number
 }
