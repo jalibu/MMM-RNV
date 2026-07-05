@@ -1,11 +1,11 @@
 {% if errors %}
-   <div class="dimmed light small rnv-error-{{ errors.message }}">
+   <div class="dimmed light rnv-state-text rnv-error-{{ errors.message }}">
       {{ errors.message }}
    </div>
 {% else %}
    {% if departures.length > 0 %}
       <div>
-         <table class="light small rnv-schedule">
+         <table class="light rnv-schedule">
          <thead>
             <tr>
                <th class="rnv-header departure">
@@ -31,9 +31,9 @@
                   {{ moment(departure.departure).format(config.timeformat) }}
                   {% if departure.delayInMin !== 0 %}
                      {% if departure.delayInMin < 0 %}
-                        <span class="small rnv-delay rnv-early">{{ departure.delayInMin }}</span>
+                        <span class="rnv-delay rnv-early">{{ departure.delayInMin }}</span>
                      {% else %}
-                        <span class="small rnv-delay">+{{ departure.delayInMin }}</span>
+                        <span class="rnv-delay">+{{ departure.delayInMin }}</span>
                      {% endif %}
                   {% endif %}
                </td>
@@ -46,7 +46,7 @@
          </table>
       </div>
    {% else %}
-      <div class="dimmed light small">
+      <div class="dimmed light rnv-state-text">
          {{ "LOADING" | translate | safe }}
       </div>
    {% endif %}

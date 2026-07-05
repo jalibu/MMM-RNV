@@ -10,8 +10,29 @@
 }
 
 table.rnv-schedule {
-  font-size: 0.5em;
-  border-spacing: 0.4em;
+  font-size: var(--font-size);
+  line-height: 1.2;
+  border-spacing: 0.35em 0.2em;
+}
+
+.MMM-RNV .rnv-schedule th {
+  font-size: var(--font-size);
+  font-weight: 600;
+}
+
+.MMM-RNV .rnv-data-line {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.MMM-RNV .rnv-delay {
+  font-size: calc(var(--font-size) * 0.72);
+  margin-left: 0.3em;
+}
+
+.MMM-RNV .rnv-state-text {
+  font-size: calc(var(--font-size) * 0.78);
+  line-height: 1.25;
 }
 
 .rnv-delay {
