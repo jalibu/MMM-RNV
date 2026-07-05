@@ -28,7 +28,6 @@ let config = {
        showPlatform: false,
        showTableHeadersAsSymbols: false,
        stationId: '2417',
-       timeformat: 'HH:mm',
        updateIntervalMs: 1 * 60 * 1000, // every 1 minute
        walkingTimeMs: 3 * 60 * 1000 // 3 minutes footwalk
      }
