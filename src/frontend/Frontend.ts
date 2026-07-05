@@ -2,6 +2,8 @@ import Utils from './Utils'
 import { Config } from '../types/Config'
 import { Departure } from '../types/Departure'
 
+type FormattedDeparture = Departure & { formattedDepartureTime: string }
+
 // Global or injected variable declarations
 interface Logger {
   log: (...args: unknown[]) => void
@@ -104,13 +106,8 @@ Module.register<Config>('MMM-RNV', {
   getTemplateData() {
     const utils = new Utils(this.config)
 
-    const departures = (this.departures ?? []).map((departure: Departure) => ({
-      ...departure,
-      formattedDepartureTime: this.dateFormatter.format(new Date(departure.departure))
-    }))
-
     return {
-      departures,
+      departures: this.departures ?? [],
       config: this.config,
       errors: this.errors,
       utils
@@ -121,7 +118,11 @@ Module.register<Config>('MMM-RNV', {
   socketNotificationReceived(notification: string, payload: unknown) {
     if (notification === `RNV_DATA_RESPONSE_${this.config.stationId}`) {
       Log.debug('Departures', payload)
-      this.departures = payload
+      const departures = payload as Departure[]
+      this.departures = departures.map((departure): FormattedDeparture => ({
+        ...departure,
+        formattedDepartureTime: this.dateFormatter.format(new Date(departure.departure))
+      }))
       this.errors = null
       this.hasLoaded = true
 
