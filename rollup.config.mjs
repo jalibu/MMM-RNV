@@ -6,6 +6,15 @@ import terser from '@rollup/plugin-terser'
 
 import pkg from './package.json' with { type: 'json' }
 
+const toName = (person) => {
+  if (typeof person === 'string') return person
+  if (person && typeof person === 'object' && typeof person.name === 'string') return person.name
+  return undefined
+}
+
+const authorAndContributors = [pkg.author, ...(Array.isArray(pkg.contributors) ? pkg.contributors : [pkg.contributors])]
+const bannerContributors = authorAndContributors.map(toName).filter(Boolean).join(', ') || 'Unknown contributors'
+
 const bannerText = `/*! *****************************************************************************
   ${pkg.name}
   Version ${pkg.version}
@@ -13,7 +22,7 @@ const bannerText = `/*! ********************************************************
   ${pkg.description}
   Please submit bugs at ${pkg.bugs.url}
 
-  (c) ${pkg.author ? pkg.author : pkg.contributors}
+  © ${bannerContributors}
   Licence: ${pkg.license}
 
   This file is auto-generated. Do not edit.
