@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.4.1](https://github.com/jalibu/MMM-RNV/compare/v1.4.0...v1.4.1) (2026-07-14)
+
+
+### Fixed
+
+* format build banner contributors correctly ([9e73235](https://github.com/jalibu/MMM-RNV/commit/9e732352d4c61cb8052bc0b4a56c639488d9ea34))
+* ignore missing realtime delay warnings ([015fbc1](https://github.com/jalibu/MMM-RNV/commit/015fbc13b04e8ce98dce7df352a3b7f9f5081a86))
+
+
+### Chores
+
+* add allowScripts configuration for simple-git-hooks ([bbe4d4f](https://github.com/jalibu/MMM-RNV/commit/bbe4d4ff28c28bf330da9410f8a397e442766ccb))
+* add type, correct contributors format and add contributor ([608992f](https://github.com/jalibu/MMM-RNV/commit/608992f17415afc2478dd9d5483ae787e82ecb6e))
+* remove unused timeformat config ([f9f44cf](https://github.com/jalibu/MMM-RNV/commit/f9f44cf0a9a4e85cb5dcb3c4d646f7fde9a229c8))
+* update devDependencies ([65c8270](https://github.com/jalibu/MMM-RNV/commit/65c8270d3a589b58387bce6c4aafdb9f3ebdeadc))
+
+
+### Code Refactoring
+
+* deduplicate frontend polling setup ([3d83f8b](https://github.com/jalibu/MMM-RNV/commit/3d83f8baf2a23ec349ba37e5d637bcc805606cd3))
+* extract departures graphql query ([5517ab0](https://github.com/jalibu/MMM-RNV/commit/5517ab0c93c7ff8788e2fb60228ebbda3464225e))
+* remove unused oauth url config field ([5ea555a](https://github.com/jalibu/MMM-RNV/commit/5ea555a2cc5fc609d444a136f74a8ebf02c7caee))
+* remove unused rollup json plugin ([a0e7175](https://github.com/jalibu/MMM-RNV/commit/a0e7175f0d45fce274b7ed4d1d7f469075de3155))
+
+
+### Tests
+
+* run unit tests via tsx ([41f48d4](https://github.com/jalibu/MMM-RNV/commit/41f48d488f76000759945b0e5f5c1dea6568310d))
+
 ## [1.4.0](https://github.com/jalibu/MMM-RNV/compare/v1.3.1...v1.4.0) (2026-07-05)
 
 
