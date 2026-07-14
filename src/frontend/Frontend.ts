@@ -58,13 +58,17 @@ Module.register<Config>('MMM-RNV', {
     const { credentials } = this.config
 
     if (credentials?.clientId && credentials?.clientSecret && credentials?.tenantId && credentials?.resourceId) {
-      this.getData()
-      this.updateInterval = setInterval(() => {
-        this.getData()
-      }, this.config.updateIntervalMs)
+      this.startPolling()
     } else {
       this.errors = { type: 'ERROR', message: 'No API credentials provided' }
     }
+  },
+
+  startPolling() {
+    this.getData()
+    this.updateInterval = setInterval(() => {
+      this.getData()
+    }, this.config.updateIntervalMs)
   },
 
   getData() {
@@ -80,10 +84,7 @@ Module.register<Config>('MMM-RNV', {
 
   resume() {
     if (!this.updateInterval && this.config.credentials?.clientId) {
-      this.getData()
-      this.updateInterval = setInterval(() => {
-        this.getData()
-      }, this.config.updateIntervalMs)
+      this.startPolling()
     }
   },
 
