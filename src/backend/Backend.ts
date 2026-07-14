@@ -5,6 +5,7 @@ import * as Log from 'logger'
 import { Color, Departure } from '../types/Departure'
 import { Config } from '../types/Config'
 import { ApiDeparture, mapApiDepartures } from './DepartureMapper'
+import { GET_DEPARTURES_QUERY } from './GetDeparturesQuery'
 
 interface ColorCode {
   id: string
@@ -95,46 +96,6 @@ module.exports = NodeHelper.create({
         }
       }
 
-      const query = `query GetDepartures($stationId: String!, $startTime: String!) {
-            station(id: $stationId) {
-                hafasID
-                longName
-                journeys(startTime: $startTime, first: 50) {
-                    totalCount
-                    elements {
-                        ... on Journey {
-                            line {
-                                id
-                            }
-                            type
-                            stops(onlyHafasID: $stationId) {
-                                pole {
-                                    platform {
-                                        type
-                                        label
-                                        barrierFreeType
-                                    }
-                                }
-                                destinationLabel
-                                plannedArrival {
-                                    isoString
-                                }
-                                realtimeArrival {
-                                    isoString
-                                }
-                                plannedDeparture {
-                                    isoString
-                                }
-                                realtimeDeparture {
-                                    isoString
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }`
-
       const departures: Departure[] = await this.withRetry(async () => {
         // A rejected token is dropped below, so re-acquire it before retrying.
         if (!this.accessToken) {
@@ -145,7 +106,7 @@ module.exports = NodeHelper.create({
         Log.info(`Request departures for station '${config.stationId}'`)
 
         try {
-          const apiResponse = await this.fetchGraphql(config.clientApiUrl, query, this.accessToken, {
+          const apiResponse = await this.fetchGraphql(config.clientApiUrl, GET_DEPARTURES_QUERY, this.accessToken, {
             stationId: config.stationId,
             startTime: journeyStart.toISOString()
           })
