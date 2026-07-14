@@ -3,6 +3,7 @@
   "version": "1.4.0",
   "description": "This is a departure monitor for the Rhein-Neckar-Verkehr (RNV) public transport network for the MagicMirror² platform.",
   "main": "MMM-RNV.js",
+  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jalibu/MMM-RNV.git"
@@ -26,8 +27,15 @@
     "RNV"
   ],
   "contributors": [
-    "Julian Dinter",
-    "Jan Litzenburger"
+    {
+      "name": "Julian Dinter"
+    },
+    {
+      "name": "Jan Litzenburger"
+    },
+    {
+      "name": "Kristjan ESPERANTO"
+    }
   ],
   "license": "MIT",
   "bugs": {
