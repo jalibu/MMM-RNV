@@ -4,7 +4,6 @@ export interface Config {
   credentials: {
     clientId: string
     clientSecret: string
-    oAuthUrl?: string
     resourceId: string
     tenantId: string
   }
