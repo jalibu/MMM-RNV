@@ -1,7 +1,6 @@
 import commonjs from '@rollup/plugin-commonjs'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
-import json from '@rollup/plugin-json'
 import terser from '@rollup/plugin-terser'
 
 import pkg from './package.json' with { type: 'json' }
@@ -58,7 +57,6 @@ export default [
     input: './src/backend/Backend.ts',
     external: ['logger', 'node_helper'],
     plugins: [
-      json(),
       typescript({ tsconfig: './tsconfig.json', module: 'ESNext', moduleResolution: 'Bundler' }),
       nodeResolve(),
       commonjs(),
