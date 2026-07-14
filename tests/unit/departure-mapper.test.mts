@@ -90,7 +90,7 @@ describe('mapApiDepartures', () => {
     assert.equal(early[0].delayInMin, -4)
   })
 
-  it('defaults delay to 0 and emits warning when realtime departure is missing', () => {
+  it('defaults delay to 0 without warning when realtime departure is missing', () => {
     let warningMessage = ''
     const mapped = mapApiDepartures([createApiDeparture({ realtime: null })], {
       ...defaultOptions,
@@ -100,7 +100,7 @@ describe('mapApiDepartures', () => {
     })
 
     assert.equal(mapped[0].delayInMin, 0)
-    assert.match(warningMessage, /Error calculating the delay:/)
+    assert.equal(warningMessage, '')
   })
 
   it('respects maxResults', () => {

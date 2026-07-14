@@ -56,17 +56,17 @@ export function mapApiDepartures(
     const plannedDepartureDate = new Date(stop.plannedDeparture.isoString)
 
     let delayInMinutes = 0
-    try {
-      const realtimeIso = stop.realtimeDeparture?.isoString
-      if (!realtimeIso) {
-        throw new Error('Missing realtime departure')
-      }
+    const realtimeIso = stop.realtimeDeparture?.isoString
+    if (realtimeIso) {
       const realtimeDepartureDate = new Date(realtimeIso)
-      const delayInMs = realtimeDepartureDate.getTime() - plannedDepartureDate.getTime()
-      delayInMinutes = Math.round(delayInMs / (60 * 1000))
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err)
-      warn(`Error calculating the delay: ${message}`)
+      const realtimeDepartureMs = realtimeDepartureDate.getTime()
+
+      if (Number.isNaN(realtimeDepartureMs)) {
+        warn(`Error calculating the delay: Invalid realtime departure '${realtimeIso}'`)
+      } else {
+        const delayInMs = realtimeDepartureMs - plannedDepartureDate.getTime()
+        delayInMinutes = Math.round(delayInMs / (60 * 1000))
+      }
     }
 
     const line = apiDeparture.line.id.split('-')[1]
