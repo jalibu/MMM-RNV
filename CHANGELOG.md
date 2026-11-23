@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.5.0](https://github.com/jalibu/MMM-RNV/compare/v1.4.1...v1.5.0) (2026-11-23)
+
+### Added
+
+* **config:** add module config schemaupdate ([c6e7f92](https://github.com/jalibu/MMM-RNV/commit/c6e7f928ac895ed8053208fcca9bf212abfb7190))
+
+### Chores
+
+* update devDependencies ([c94f464](https://github.com/jalibu/MMM-RNV/commit/c94f464619a801f3ad5fa516bfe3c187613b0d26))
+
 ## [1.4.1](https://github.com/jalibu/MMM-RNV/compare/v1.4.0...v1.4.1) (2026-07-14)
 
 
