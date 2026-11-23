@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "animationSpeedMs": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Duration of the DOM update animation in milliseconds"
+    },
+    "updateIntervalMs": {
+      "type": "integer",
+      "minimum": 1000,
+      "description": "Interval between departure requests in milliseconds"
+    },
+    "walkingTimeMs": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Walking time used to filter reachable departures"
+    },
+    "stationId": {
+      "type": "string",
+      "description": "RNV station or HAFAS station identifier"
+    },
+    "showLineColors": {
+      "type": "boolean",
+      "description": "Colorize departure line badges"
+    },
+    "maxResults": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum number of departures to display"
+    },
+    "credentials": {
+      "type": "object",
+      "description": "RNV API credentials",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "Microsoft Entra client ID"
+        },
+        "clientSecret": {
+          "type": "string",
+          "description": "Microsoft Entra client secret"
+        },
+        "resourceId": {
+          "type": "string",
+          "description": "Microsoft Entra API resource ID"
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Microsoft Entra tenant ID"
+        }
+      }
+    },
+    "clientApiUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "RNV GraphQL API URL"
+    },
+    "showPlatform": {
+      "type": "boolean",
+      "description": "Display the departure platform"
+    },
+    "showTableHeadersAsSymbols": {
+      "type": "boolean",
+      "description": "Use symbols instead of text in table headers"
+    },
+    "highlightLines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Line identifiers to highlight"
+    },
+    "excludeLines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Line identifiers to exclude"
+    },
+    "excludePlatforms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Platform labels to exclude"
+    },
+    "icons": {
+      "type": "object",
+      "description": "Font Awesome icon mapping by vehicle type",
+      "properties": {
+        "STRASSENBAHN": {
+          "type": "string"
+        },
+        "STADTBUS": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  }
+}
